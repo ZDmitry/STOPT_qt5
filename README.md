@@ -1,4 +1,4 @@
-PROJECT NAME: STOPT (Qt ported version)
+PROJECT NAME: STOPT (Qt ver.)
 ================================================================================
 - AUTHOR:   Zagnoyko Dmitry (hiroshidi@gmail.com)  
 - LICENCE:  GPLv3    

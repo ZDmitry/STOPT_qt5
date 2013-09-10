@@ -90,7 +90,7 @@ Radiofield2D& Radiofield2D::operator=(const Radiofield2D& r)
 std::vector< std::vector< POINT > > Radiofield2D::getPointsPacked()
 {
     vector< vector< POINT > > packedData;
-    packedData.reserve(getCount());
+    packedData.reserve(row_);
 
     for(int i=0; i<row_; i++) {
         vector<POINT> packedRow;
@@ -192,7 +192,7 @@ int Radiofield2D::blockCount(int lenght, int radius)
 }
 
 // find optimal radius/cost variant among set
-int Radiofield2D::getOptimalVariant(const std::vector<Radiofield2D>* var)
+int Radiofield2D::getOptimalVariant(const std::vector<Radiofield2D *> *var)
 {
     int optvar;   // optimal variant index
     int optcost;  // optimal cost
@@ -201,19 +201,23 @@ int Radiofield2D::getOptimalVariant(const std::vector<Radiofield2D>* var)
     int curcost;  // current cost
     int cursq;    // current square
 
-    curcost = var->front().getTotalCost();
-    cursq = var->front().effectiveArea();
+    vector<Radiofield2D*>::const_iterator it = var->begin();
+
+    curcost = (*it)->getTotalCost();
+    cursq   = (*it)->effectiveArea();
 
     optcost = curcost;
-    optsq = cursq;
+    optsq   = cursq;
 
-    optvar = 0;
+    optvar  = 0;
 
     int i=optvar;
-    for (vector<Radiofield2D>::const_iterator it = (var->begin()+1); it != var->end(); ++it, ++i)
+    it++; //  var->begin() + 1 = second element
+
+    for (; it != var->end(); ++it, ++i)
     {
-        curcost = (*it).getTotalCost();
-        cursq = (*it).effectiveArea();
+        curcost = (*it)->getTotalCost();
+        cursq = (*it)->effectiveArea();
 
         if (curcost<optcost)
         {
@@ -312,7 +316,12 @@ double Radiofield2D::filledArea() const
 
     for (int i=0; i < getCount(); i++)
     {
-        s += M_PI * powf(support_[i].x*k,2.0);
+        if (dynGenerated_ && support_!= nullptr) {
+            s += M_PI * powf(support_[i].x*k,2.0);
+        }
+        else {
+            s += M_PI * powf(radius_*k,2.0);
+        }
     }
 
     return s;

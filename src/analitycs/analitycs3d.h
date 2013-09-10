@@ -35,17 +35,16 @@
 class Radiofield3D : public Radiofield {
 public:
     Radiofield3D();
-    ~Radiofield3D();
+    virtual ~Radiofield3D();
     Radiofield3D(int width, int height);
     Radiofield3D(int width, int height, int lenght);
     Radiofield3D(int width, int height, int lenght, int radius);
     Radiofield3D(int width, int height, int lenght, int radius, int cost);
 
     // ptr to vector of ptr - less memory consumption
-    std::vector< std::vector< std::vector< STOPT::POINT3D > > >  getPointsPacked();
-    std::vector< STOPT::POINT3D >* getPoints(){ return &points_; }
+    const std::vector< std::vector< std::vector< STOPT::POINT3D >* >* >* getPoints(){ return points_; }
 
-    static  int  getOptimalVariant(const std::vector<Radiofield3D>* var);
+    static  int  getOptimalVariant(const std::vector<Radiofield3D *> *var);
 
     virtual int  getCount() const { return row_*column_*line_; }
     virtual bool isFilled();
@@ -66,6 +65,8 @@ private:
 
     void buildPoints(int height, int width, int lenght, int radius);
 
+    void freeMem();
+
     int line_;
 
     int lenght_;
@@ -73,7 +74,11 @@ private:
     // store in vector format points
     // see notes inside implimentation
     // of func - buildPoints(..)
-    std::vector<STOPT::POINT3D> points_;
+    // PACKGAGE FORMAT:
+    // vector <   z    <   y    <   x    > > >
+    // vector < line   < row    < column > > >
+    // vector < lenght < height < width  > > >
+    std::vector< std::vector< std::vector< STOPT::POINT3D >* >* >* points_;
 };
 
 #endif //ANALITYCS3D_H

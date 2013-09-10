@@ -21,6 +21,8 @@
 
 #include "analitycs3d.h"
 
+#include <algorithm>
+
 using namespace std;
 using namespace STOPT;
 
@@ -30,32 +32,32 @@ using namespace STOPT;
 Radiofield3D::Radiofield3D()
     :Radiofield(0, 0, 0, 0), lenght_(0)
 {
-    points_.clear();
+    points_ = new  vector< vector< vector< POINT3D >* >* >();
 }
 
 Radiofield3D::Radiofield3D(int width, int height)
     :Radiofield(width, height, 0, 0), lenght_(0)
 {
-    points_.clear();
+    points_ = new  vector< vector< vector< POINT3D >* >* >();
 }
 
 Radiofield3D::Radiofield3D(int width, int height, int lenght)
     :Radiofield(width, height, 0, 0), lenght_(lenght)
 {
-    points_.clear();
+    points_ = new  vector< vector< vector< POINT3D >* >* >();
 }
 
 Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius)
     :Radiofield(width, height, radius, 0), lenght_(lenght)
 {
-    points_.clear();
+    points_ = new  vector< vector< vector< POINT3D >* >* >();
     Radiofield3D::buildPoints(height, width, lenght, radius);
 }
 
 Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius, int cost)
     :Radiofield(width, height, radius, cost), lenght_(lenght)
 {
-    points_.clear();
+    points_ = new  vector< vector< vector< POINT3D >* >* >();
     Radiofield3D::buildPoints(height, width, lenght, radius);
 }
 
@@ -63,7 +65,9 @@ Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius, int co
 
 Radiofield3D::~Radiofield3D()
 {
-    if (!points_.empty()) points_.clear();
+
+    freeMem();
+    delete points_;
 }
 
 
@@ -87,33 +91,6 @@ Radiofield3D& Radiofield3D::operator=(const Radiofield3D& r)
     return (*this);
 }
 
-// get points packed into 3d vector
-vector< vector< vector< POINT3D > > >  Radiofield3D::getPointsPacked()
-{
-    vector< vector< vector< POINT3D > > > packedData;
-    packedData.reserve(getCount());
-
-    vector<POINT3D>::const_iterator ii = points_.begin();
-    for(int i=0; i<row_; i++) {
-       vector< vector< POINT3D > > packedRow;
-       packedRow.reserve(column_);
-
-       for(int j=0; j<column_; j++) {
-           vector<POINT3D> packedColumn;
-           packedColumn.reserve(line_);
-
-           for(int k=0; k<line_; k++, ii++) {
-                packedColumn.push_back((*ii));
-           }
-           packedRow.push_back(packedColumn);
-       }
-       packedData.push_back(packedRow);
-    }
-
-    return packedData;
-}
-
-
 // calculate block count by given lenght and radius
 int Radiofield3D::blockCount(int lenght, int radius)
 {
@@ -132,7 +109,7 @@ int Radiofield3D::blockCount(int lenght, int radius)
 }
 
 // find optimal radius/cost variant among set
-int  Radiofield3D::getOptimalVariant(const std::vector<Radiofield3D>* var)
+int  Radiofield3D::getOptimalVariant(const std::vector< Radiofield3D* >* var)
 {
     int optvar;   // optimal variant index
     int optcost;  // optimal cost
@@ -141,19 +118,23 @@ int  Radiofield3D::getOptimalVariant(const std::vector<Radiofield3D>* var)
     int curcost;  // current cost
     int curvol;   // current volume
 
-    curcost = var->front().getTotalCost();
-    curvol = var->front().effectiveVolume();
+    vector<Radiofield3D*>::const_iterator it = var->begin();
+
+    curcost = (*it)->getTotalCost();
+    curvol  = (*it)->effectiveVolume();
 
     optcost = curcost;
-    optvol = curvol;
+    optvol  = curvol;
 
-    optvar = 0;
+    optvar  = 0;
 
     int i=optvar;
-    for (vector<Radiofield3D>::const_iterator it = (var->begin()+1); it != var->end(); ++it, ++i)
+    it++; //  var->begin() + 1 = second element
+
+    for (; it != var->end(); ++it, ++i)
 	{
-        curcost = (*it).getTotalCost();
-        curvol  = (*it).effectiveVolume();
+        curcost = (*it)->getTotalCost();
+        curvol  = (*it)->effectiveVolume();
 		
 		if (curcost<optcost)
 		{
@@ -176,37 +157,70 @@ int  Radiofield3D::getOptimalVariant(const std::vector<Radiofield3D>* var)
 // build points using dimensions and radius
 void Radiofield3D::buildPoints(int height, int width, int lenght, int radius)
 {
-    row_ = blockCount(height, radius);
-    column_ = blockCount(width,  radius);
-    line_ = blockCount(lenght, radius);
+    column_ = blockCount(width,  radius);  // x  i  a
+    row_    = blockCount(height, radius);  // y  j  b
+    line_   = blockCount(lenght, radius);  // z  k  c
+
     count_ = row_*column_*line_;
 
     float ds=0.f;
 
     if ( am_ == A_ALT ) ds=0.2;
 
-    double a=lenght/(double)line_;
+    double a=width/(double)column_;
     double b=height/(double)row_;
-    double c=width/(double)column_;
+    double c=lenght/(double)line_;
     //double rr=((sqrtf((a*a)+(b*b)+(c*c)))/2.0f)/sqrt(3.0f);
-    float ry=a/2;//((sqrtf((a*a)+(b*b)))/2);//sqrt(2.0);
-    float rx=b/2;//((sqrtf((a*a)+(c*c)))/2);//sqrt(2.0);
+    float rx=a/2;//((sqrtf((a*a)+(c*c)))/2);//sqrt(2.0);
+    float ry=b/2;//((sqrtf((a*a)+(b*b)))/2);//sqrt(2.0);
     float rz=c/2;//((sqrtf((c*c)+(b*b)))/2);//sqrt(2.0);
 
-    // WARN: too big chunck size allocation!!! neet to optimize !!!
-    //points_=(POINT3D*)VirtualAlloc(NULL,sizeof(POINT3D)*nn, MEM_RESERVE | MEM_COMMIT,PAGE_READWRITE);
-    if (!points_.empty()) points_.clear();
+    // WARN: too big chunck size allocation!!!
+    // points_=(POINT3D*)VirtualAlloc(NULL,sizeof(POINT3D)*nn, MEM_RESERVE | MEM_COMMIT,PAGE_READWRITE);
+    // replace raw pointer to vector of pointer
+    if (!points_->empty()) freeMem();
+    points_->reserve(line_);
 
-    vector<POINT3D>::iterator ii = points_.begin();
-    for(int i=0; i<row_; i++)
-        for(int j=0; j<line_; j++)
-            for(int k=0; k<column_; k++, ii++)
+    for(int k=0; k<line_; k++) // put z - lenght
+    {
+        points_->push_back( new vector< vector< POINT3D >* >() );
+        vector< vector< POINT3D >* >*& packedRow = points_->at(k);
+        packedRow->reserve(row_);
+
+        for(int j=0; j<row_; j++)    // put y - height
         {
-            //ii=k*nw*nl+i*nl+j
-            (*ii).x=a*j+rx+ds;
-            (*ii).y=(-1)*(b*i+ry+ds);
-            (*ii).z=c*k+rz+ds;
+            packedRow->push_back( new vector<POINT3D>(column_) );
+            vector< POINT3D >*& packedColumn = packedRow->at(row_ - j - 1);
+            packedColumn->reserve(column_);
+
+            for(int i=0; i<column_; i++) // put x - width
+            {
+                //ii=k*nw*nl+i*nl+j
+                POINT3D pt;
+                pt.x=a*i+rx+ds;         // a  i  x
+                pt.y=(-1)*(b*j+ry+ds);  // b  j  y
+                pt.z=c*k+rz+ds;         // c  z  k
+
+                packedColumn->push_back(pt);
+            }
         }
+    }
+}
+
+void Radiofield3D::freeMem()
+{
+    if (!points_->empty()) {
+        vector< vector< vector< POINT3D >* >* >::iterator it = points_->begin();
+        for(; it!=points_->end(); it++) {
+            if( !( (*it)->empty() ) ) {
+                for_each( (*it)->begin(), (*it)->end(),
+                          DeleteVector< vector< POINT3D >* >());
+            }
+            delete (*it);
+        }
+
+        points_->clear();
+    }
 }
 
 // is volume covered by points?
@@ -214,17 +228,36 @@ bool Radiofield3D::isFilled()
 {
 	bool ok=0;
 
-    vector<POINT3D>::const_iterator ii = points_.begin();
-    for (int i=0; i<lenght_; i++)
+
+    for (int z=0; z<lenght_; z++)
 	{
-        for (int j=0; j<width_; j++)
+
+        for (int y=0; y<height_; y++)
 		{
-            for (int k=0; k<height_; k++)
+
+            for (int x=0; x<width_; x++)
 			{
-                POINT3D pp = {i, k, j}; //orig: i,j,w
-                ok=pointCoverage( pp, (*ii), radius_);
-				if (ok) break;
+                POINT3D pp = {x, y, z};
+
+                // here 'ok' mean 'found hotspot, that cover point'
+                vector< vector< vector< POINT3D >* >* >::const_iterator ii = points_->begin();
+                for (; ii!=points_->end(); ii++) {
+
+                    vector< vector< POINT3D >* >::const_iterator jj = (*ii)->begin();
+                    for (; jj!=(*ii)->end(); jj++) {
+
+                        vector< POINT3D >::const_iterator kk = (*jj)->begin();
+                        for (; kk!=(*jj)->end(); kk++) {
+                            ok=pointCoverage( pp, (*kk), radius_);
+                            if (ok) break;
+                        }
+                        if (ok) break;
+                    }
+                    if (ok) break;
+                }
+                if (ok) break;
 			}
+            // further '!ok' mean 'not fount hotspot, that cover point'
 			if(!ok) break;
 		}
 		if(!ok) break;

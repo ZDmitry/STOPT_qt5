@@ -24,6 +24,12 @@
 
 #include <QWidget>
 
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QCheckBox>
+
+#include "analitycs/analitycs2d.h"
+#include "analitycs/analitycs3d.h"
+
 namespace Ui {
 class QMainWin;
 }
@@ -36,20 +42,53 @@ public:
     explicit QMainWin(QWidget *parent = 0);
     ~QMainWin();
 
+    void clearCheckedVariants(QList< QCheckBox* > cv);
+    void enableCheckedVariants(QList< QCheckBox* > cv, bool enable);
+    int  bestCheckedVariants(QList< QCheckBox* > cv);
+
+    void clearInputPair(QPair<QLineEdit *, QLineEdit *> qp);
+    bool isInputPairEmpty(QPair<QLineEdit *, QLineEdit *> qp);
+    void enableInputPair(QPair<QLineEdit *, QLineEdit *> qp, bool enabled);
+
     void clearFields(QWidget *tab);
-    void disableVariantFields(QWidget *grpVariants, bool enabled);
+    void enableFieldsGroup(QWidget *grpVariants, bool enabled);
     void enableROField(QWidget *obj, bool enable);
 
+    int  numOfFilledVariants(QList<QPair<QLineEdit *, QLineEdit *> > li);
+
+    virtual bool eventFilter(QObject *target, QEvent *event);
+
+signals:
+    void videoModeChanged(STOPT::VMODE);
+    void inputComplete();  // input completed, can fill data
+    void dataReady();      // data filled, can render
 
 public slots:
     void videoModeSelect(int i);
     void interactionModeSelect(int s);
+    void projectionModeSelect(int s);
+    void enableMoreVariants(QString);
+    void dimensionsPassed(QString);
+
+    void prepareData();
 
 private:
     Ui::QMainWin *ui;
 
+    // first - radius, second - price
+    QList< QPair<QLineEdit*, QLineEdit*> > li2dVariantsIn;
+    QList< QPair<QLineEdit*, QLineEdit*> > li3dVariantsIn;
+
+    // first - cost, second - overlap
+    QList< QPair<QLineEdit*, QLineEdit*> > li2dVariantsOut;
+    QList< QPair<QLineEdit*, QLineEdit*> > li3dVariantsOut;
+
+    QList< QCheckBox* > li2dVariantsBest;
+    QList< QCheckBox* > li3dVariantsBest;
+
     static const QString RO_DISABLED_STYLE;
     static const QString RO_ENABLED_STYLE;
+    static const int     MAX_VARIANT_COUNT = 5;
 };
 
 #endif // QMAINWIN_H

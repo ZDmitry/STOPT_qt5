@@ -57,4 +57,18 @@ namespace STOPT {
 
 }
 
+// functor for delete vector of pointers
+template<class T> class DeleteVector
+{
+    public:
+    // Overloaded () operator.
+    // This will be called by for_each() function.
+    bool operator()(T x) const
+    {
+        // Delete pointer.
+        delete x;
+        return true;
+    }
+};
+
 #endif //STOPTDEF_H

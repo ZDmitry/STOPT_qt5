@@ -36,6 +36,7 @@
 class Radiofield {
 public:
     Radiofield(int width, int height, int radius, int cost);
+    virtual ~Radiofield() {;}
 
     virtual int  getCount() const { return row_*column_; }
     virtual int  getTotalCost() const { return cost_*count_; }

@@ -33,7 +33,7 @@
 class Radiofield2D : public Radiofield {
 public:
     Radiofield2D();
-    ~Radiofield2D();
+    virtual ~Radiofield2D();
     Radiofield2D(int width, int height);
     Radiofield2D(int width, int height, int radius);
     Radiofield2D(int width, int height, int radius, int cost);
@@ -49,7 +49,7 @@ public:
     virtual int  getTotalCost() const;
     virtual bool isFilled();
 
-    static  int  getOptimalVariant(const std::vector<Radiofield2D>* var);
+    static  int  getOptimalVariant(const std::vector<Radiofield2D* >* var);
 
     double filledArea() const;
     double effectiveArea() const;
