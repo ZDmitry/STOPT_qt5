@@ -21,59 +21,52 @@
 #ifndef OGLSPHERE_H
 #define OGLSPHERE_H
 
-// OpenGL
-#ifdef Q_OS_MAC
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#include <GLUT/glut.h>
-#elif defined(Q_OS_WIN)
-#include <windows.h>
-#include <GL/gl.h>
-//#include <GL/glut.h>
-#include <GL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+#include "shape.h"
 
-class OglSphere{
+#include <qopengl.h>
+
+class QVector3D;
+
+class OGLSphere: public Shape {
 public:
-	OglSphere();
-	OglSphere(double x, double y, double z, double r);
+    OGLSphere(const QPointF   &position, qreal z, qreal radius);
+    OGLSphere(const QVector3D &position, qreal radius);
+    ~OGLSphere();
 
-    void     setRadius( double r){r_=r;}
-    double   getRadius() const {return r_;}
+    // nothing to do
+    void       move(const QRectF &boundRect) {}
+    // correct move
+    void       move(const QVector3D &newPos);
 
-    void	 setColor(float r, float g, float b);
-    void	 setColor(float r, float g, float b, float a);
+    QRectF     rect() const;
+    qreal      zCoord() const;
+    const QVector3D* position() { return pos3d_; }
 
-    float    getR() const {return col_r_;}
-    float    getG() const {return col_g_;}
-    float    getB() const {return col_b_;}
-    float    getA() const {return col_alp_;}
+    // nothing to do with simple paint
+    void       draw(QPainter *painter) const {}
+    // OpenGL instructions
+    void       draw() const;
 
-    double   getX() const {return ox_;}
-    double   getY() const {return oy_;}
-    double   getZ() const {return oz_;}
+    // nothing to do
+    void       updateBrush(){}
 
-    void     moveTo(double x, double y, double z){ox_=x; oy_=y; oz_=z;}
-
-    void     render(bool useCore);
-
-    OglSphere&  operator=(const OglSphere&);
+    void       setRadius(qreal r)  { radius_=r; }
+    qreal      getRadius() const { return radius_; }
 
 private:
-    void     draw();
-    void     drawCenter();
+    OGLSphere(const OGLSphere &) = delete;
+    OGLSphere &operator=(const OGLSphere &) = delete;
 
-	void     glSphere(bool, GLfloat, GLfloat, GLfloat);
-	void     glSphere(bool, GLfloat, GLfloat, GLfloat, GLfloat);
-	void     glSphere(bool, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
-	void     glSphere(GLfloat, GLfloat, GLfloat, bool, GLfloat, GLfloat, GLfloat, GLfloat, GLfloat);
+    void       buildGeometry(int d, qreal s){}
 
-	double	 r_;
-	float    col_r_, col_g_, col_b_, col_alp_;
-    double	 ox_, oy_, oz_;
+    qreal      radius_;
+    bool       wireframe_;
+    // x, y, z
+    QVector3D *pos3d_;
+    GLfloat   *fColor_; //[4]
+
+    static const int SPHERE_SLICE = 60;
+    static const int SPHERE_STACK = 30;
 };
 
 #endif //OGLSPHERE_H

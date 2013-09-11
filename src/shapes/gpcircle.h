@@ -41,9 +41,10 @@ public:
     void   setRadius(int r){ radius_=r; }
     int    getRadius() const { return radius_; }
 
-    GPCircle&  operator=(const GPCircle& r);
-
 private:
+    GPCircle(const GPCircle &) = delete;
+    GPCircle &operator=(const GPCircle &) = delete;
+
     void buildGeometry(int d, qreal s);
 
     qreal   radius_;

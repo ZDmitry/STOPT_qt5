@@ -23,9 +23,9 @@ SOURCES += main.cpp\
     qtlogo.cpp \
     support/glrendersupport.cpp \
     shapes/gpcircle.cpp \
-    #shapes/oglsphere.cpp \
-    #shapes/oglbox.cpp \
-    #shapes/gpbox.cpp
+    shapes/oglsphere.cpp \
+    shapes/oglbox.cpp \
+    shapes/gpbox.cpp \
     winmain.cpp
 
 HEADERS  += qmainwin.h \
@@ -41,9 +41,9 @@ HEADERS  += qmainwin.h \
     qtlogo.h \
     support/glrendersupport.h \
     shapes/gpcircle.h \
-    #shapes/oglsphere.h \
-    #shapes/oglbox.h \
-    #shapes/gpbox.h
+    shapes/oglsphere.h \
+    shapes/oglbox.h \
+    shapes/gpbox.h \
     winmain.h
 
 FORMS  += qmainwin.ui

@@ -23,47 +23,56 @@
 
 #include "shape.h"
 
-class Circle: public Shape {
+#include <qopengl.h>
+
+class QVector3D;
+
+class OGLBox: public Shape {
 public:
-	Circle();
-	Circle(int x, int y, int r,int n);
+    OGLBox(const QPointF   &position, qreal z, qreal width, qreal height, qreal lenght);
+    OGLBox(const QVector3D &position, qreal width, qreal height, qreal lenght);
+    ~OGLBox();
 
-    void     setNumber(int n){n_=n;}
-    int      getNumber() const {return n_;}
+    // nothing to do
+    void       move(const QRectF &boundRect) {}
+    // correct move
+    void       move(const QVector3D &newPos);
 
-    void     setRadius(int r){r_=r;}
-    int      getRadius() const {return r_;}
+    QRectF     rect() const;
+    qreal      zCoord() const;
+    const QVector3D* position() {   return pos3d_; }
+    const QVector3D* dimensions() { return dim3d_; }
+    void       setDimensions(const QVector3D &newDim);
 
-    int      getX() const {return ox_;}
-    int      getY() const {return oy_;}
+    // nothing to do with simple paint
+    void       draw(QPainter *painter) const {}
+    // OpenGL instructions
+    void       draw() const;
 
-    virtual  void moveBy(int x, int y){_x=ox_=x;_y=oy_=y;}
-    void     shiftBy(int x, int y){_x=ox_-x;_y=oy_-y;}
+    // nothing to do
+    void       updateBrush(){}
 
-    virtual  void draw(QPainter &)const;
+    qreal      getWidth() const;
+    void       setWidth(qreal w);
 
-    Circle&  operator=(const Circle& r);
+    qreal      getHeight() const;
+    void       setHeight(qreal h);
+
+    qreal      getLenght() const;
+    void       setLenght(qreal l);
 
 private:
-	int r_;
-	int n_;
-	int ox_,oy_;
-};
+    OGLBox(const OGLBox &) = delete;
+    OGLBox &operator=(const OGLBox &) = delete;
 
-class Box: public Figure{
-public:
-	Box(int x, int y, int dx, int dy);
+    void       buildGeometry(int d, qreal s){}
 
-    void    resize(int dx, int dy){dx_=dx; dy_=dy;}
-    int     length(){return dx_;}
-    int     width(){return dy_;}
-
-    virtual void moveBy(int x, int y){_x=10-x; _y=10-y;}
-
-    virtual void draw(QPainter&)const;
-
-private:
-	int dx_,dy_;
+    bool       wireframe_;
+    // coord      x, y, z
+    QVector3D  *pos3d_;
+    // dimensions x, y, z
+    QVector3D  *dim3d_;
+    GLfloat    *fColor_; //[4]
 };
 
 #endif //OGLBOX_H

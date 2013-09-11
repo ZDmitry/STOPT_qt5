@@ -19,116 +19,116 @@
     02110-1301  USA.
 */
 
-#include "ogl_shape.h"
+#include "oglsphere.h"
 
-#include <cassert>
+#include <QGLWidget>
+#include <QVector3D>
 
-//OpenGL Headers Files
-//#include <gl\glut.h>
+//extra gl functions
+#include <GL/glu.h>
 
-
-OglSphere::OglSphere(double x, double y, double z, double r)
+static inline void qSetColor(float colorVec[], QColor c)
 {
-	ox_=x; oy_=y; oz_=z;
-	assert(r>0);
-	r_=r;
+    colorVec[0] = c.redF();
+    colorVec[1] = c.greenF();
+    colorVec[2] = c.blueF();
+    colorVec[3] = c.alphaF();
 }
 
-OglSphere::OglSphere()
+OGLSphere::OGLSphere(const QPointF &position, qreal z, qreal radius)
+    : Shape(position),
+      radius_(radius)
 {
-	ox_=oy_=oz_=0;
-	r_=1;
+    pos3d_ = new QVector3D(pos_.x(),pos_.y(), z);
+    wireframe_ = false;
+
+    fColor_ = new GLfloat[4];
+    qSetColor(fColor_, QColor(Qt::darkGray));
+
+    // alpha got from innerColor
+    fColor_[4] = inColor_.alphaF();
 }
 
-OglSphere& OglSphere::operator=(const OglSphere& r)
+OGLSphere::OGLSphere(const QVector3D &position, qreal radius)
+    : Shape( QPointF(position.x(), position.y()) ),
+      radius_(radius)
 {
-	ox_=r.getX();
-	oy_=r.getY();
-	r_=r.getRadius();
-	col_r_=r.getR();
-	col_g_=r.getG();
-	col_b_=r.getB();
-	col_alp_=r.getA();
+    pos3d_ = new QVector3D(position.x(), position.y(), position.z());
+    wireframe_ = false;
 
-	return (*this);
+    fColor_ = new GLfloat[4];
+    qSetColor(fColor_, QColor(Qt::darkGray));
+
+    // alpha got from innerColor
+    fColor_[4] = inColor_.alphaF();
 }
 
-void OglSphere::setColor(float r, float g, float b)
+OGLSphere::~OGLSphere()
 {
-	setColor(r,g,b,1.0f);
+    delete pos3d_;
+    delete[] fColor_;
 }
 
-void OglSphere::setColor(float r, float g, float b, float a)
+void OGLSphere::move(const QVector3D &newPos)
 {
-	col_r_=r;
-	col_g_=g;
-	col_b_=b;
-	col_alp_=a;
+    pos3d_->setX(newPos.x());
+    pos3d_->setY(newPos.y());
+    pos3d_->setZ(newPos.z());
 }
 
-void  OglSphere::render(bool useCore)
+QRectF OGLSphere::rect() const
 {
-    if (useCore) drawCenter();
-    draw();
+    return QRectF(pos_.x() - radius_, pos_.y() - radius_,
+                  2 * radius_, 2 * radius_);
 }
 
-void OglSphere::drawCenter()
+qreal OGLSphere::zCoord() const
 {
-	glPushMatrix();
-		glSphere(ox_, oy_, oz_, 0, r_/20, 0.9,0.9,0.9,1.f);
-	glPopMatrix();
+    return pos3d_->z();
 }
 
-void OglSphere::draw()
-{
-	glPushMatrix();
-		glSphere(ox_, oy_, oz_, 0, r_*1.16f, col_r_, col_g_, col_b_, col_alp_);
-	glPopMatrix();
-}
-
-//SPHERE
-void OglSphere::glSphere(bool bWired, GLfloat r, GLfloat g, GLfloat b)
-{
-	glSphere(bWired, r, g, b, 1.0f);
-}
-
-void OglSphere::glSphere(bool bWired, GLfloat r, GLfloat g, GLfloat b, GLfloat a)
-{
-	glSphere(bWired, 1.0f, r, g, b, a);
-}
-
-void OglSphere::glSphere(bool bWired, GLfloat s, GLfloat r, GLfloat g, GLfloat b, GLfloat a)
-{
-	glSphere(0.0f, 0.0f, 0.0f, bWired, s, r, g, b, a);
-}
-
-void OglSphere::glSphere(GLfloat x, GLfloat y, GLfloat z, bool bWired, GLfloat s, GLfloat r, GLfloat g, GLfloat b, GLfloat a)
+void OGLSphere::draw() const
 {
     GLUquadric* params = gluNewQuadric();
     gluQuadricTexture(params,GL_TRUE);
 
-	glPushMatrix();
-		//glScalef(s,s,s);
-		glTranslatef(x,y,z);
-		
-		glColor4f(r,g,b,a);
+    glPushMatrix();
+        //glScalef(s,s,s);
+        //glTranslatef(x,y,z);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, fColor_);
 
-		//glMaterialfv(GL_FRONT,GL_AMBIENT,make_vect(0.2473f, 0.1995f, 0.0745f, 1.0f));
-		//glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,make_vect(r,g,b,1.f));
-		//glMaterialfv(GL_FRONT,GL_SPECULAR,make_vect(0.6283f, 0.5558f, 0.3661f, 1.0f));
-		//glMaterialfv(GL_FRONT,GL_EMISSION,make_vect(0.0f, 0.0f, 0.0f, 0.0f));
-		//glMaterialf(GL_FRONT,GL_SHININESS,3.0f);
+        //glMaterialfv(GL_FRONT,GL_AMBIENT,make_vect(0.2473f, 0.1995f, 0.0745f, 1.0f));
+        //glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,make_vect(r,g,b,1.f));
+        //glMaterialfv(GL_FRONT,GL_SPECULAR,make_vect(0.6283f, 0.5558f, 0.3661f, 1.0f));
+        //glMaterialfv(GL_FRONT,GL_EMISSION,make_vect(0.0f, 0.0f, 0.0f, 0.0f));
+        //glMaterialf(GL_FRONT,GL_SHININESS,3.0f);
 
-		if (bWired)
+        if (wireframe_)
             //glutWireSphere(s,60,60);
             gluQuadricDrawStyle(params,GLU_LINE);
-		else
+        else
             //glutSolidSphere(s,60,60);
             gluQuadricDrawStyle(params,GLU_FILL);
 
         //args: [1]GLUquadric*, [2]GLdouble, [3]GLint, [4]GLint
-        gluSphere(params,s,60,60);
-	glPopMatrix();
+        gluSphere(params, radius_*1.16f, SPHERE_SLICE, SPHERE_STACK);
+
+    glPopMatrix();
 
     gluDeleteQuadric(params);
+
 }
+////////////////////////////////
+
+//void  OglSphere::render(bool useCore)
+//{
+//    if (useCore) drawCenter();
+//    draw();
+//}
+
+//void OglSphere::drawCenter()
+//{
+//	glPushMatrix();
+//		glSphere(ox_, oy_, oz_, 0, r_/20, 0.9,0.9,0.9,1.f);
+//	glPopMatrix();
+//}

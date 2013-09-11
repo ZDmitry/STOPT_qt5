@@ -88,37 +88,6 @@ void GPCircle::updateBrush()
     brush_ = QBrush(grad);
 }
 
-GPCircle& GPCircle::operator=(const GPCircle& r)
-{
-    pos_.setX(0);
-    pos_.setY(0);
-
-    move( r.rect() );
-
-    number_   = r.getNumber();
-    radius_   = r.getRadius();
-
-    int ri, g, b, a;
-
-    ri = r.getInnerColor().red();
-    g  = r.getInnerColor().green();
-    b  = r.getInnerColor().blue();
-    a  = r.getInnerColor().alpha();
-
-    inColor_.setRgb(ri,g,b,a);
-
-    ri = r.getOuterColor().red();
-    g  = r.getOuterColor().green();
-    b  = r.getOuterColor().blue();
-    a  = r.getOuterColor().alpha();
-
-    outColor_.setRgb(ri,g,b,a);
-
-    updateBrush();
-
-    return (*this);
-}
-
 void GPCircle::buildGeometry(int d, qreal s)
 {
     Q_UNUSED(d)

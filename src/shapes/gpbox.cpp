@@ -28,24 +28,59 @@
 
 // BOX
 
-Box::Box(int x, int y,int dx, int dy)
-:Figure(x,y),dx_(dx),dy_(dy)
-{}
-
-void Box::draw(QPainter &hdc) const{
-    QBrush brush(col_);
-    QBrush oldBrush = hdc.brush();
-
-    QPen pen(brush,1,Qt::SolidLine);
-    QPen oldPen = hdc.pen();
-
-    hdc.setPen(pen);
-    hdc.setBrush(brush);
-    hdc.setBackgroundMode(Qt::TransparentMode);
-
-    hdc.drawRect(_x, _y, dx_, dy_);
-
-    hdc.setBackgroundMode(Qt::OpaqueMode);
-    hdc.setPen(oldPen);
-    hdc.setBrush(oldBrush);
+GPBox::GPBox(const QPointF &position, qreal width, qreal height)
+    : Shape(position)
+{
+    box_.setTopLeft(position);
+    box_.setHeight(height);
+    box_.setWidth(width);
 }
+
+void GPBox::move(const QRectF &boundRect)
+{
+    qreal leftOverflow   = pos_.x() - box_.width()  - boundRect.left();
+    qreal rightOverflow  = pos_.x() + box_.width()  - boundRect.right();
+    qreal topOverflow    = pos_.y() - box_.height() - boundRect.top();
+    qreal bottomOverflow = pos_.y() + box_.height() - boundRect.bottom();
+
+    if (leftOverflow < 0.0) {
+        pos_.setX(pos_.x() - 2 * leftOverflow);
+        box_.setX(pos_.x());
+    } else if (rightOverflow > 0.0) {
+        pos_.setX(pos_.x() - 2 * rightOverflow);
+        box_.setX(pos_.x());
+    }
+
+    if (topOverflow < 0.0) {
+        pos_.setY(pos_.y() - 2 * topOverflow);
+        box_.setY(pos_.y());
+    } else if (bottomOverflow > 0.0) {
+        pos_.setY(pos_.y() - 2 * bottomOverflow);
+        box_.setY(pos_.y());
+    }
+}
+
+QRectF GPBox::rect() const
+{
+    return box_;
+}
+
+void GPBox::draw(QPainter *painter) const
+{
+    painter->save();
+    painter->setBackgroundMode(Qt::TransparentMode);
+    painter->drawRect(box_);
+    painter->restore();
+}
+
+void GPBox::updateBrush()
+{
+    brush_ = QBrush(inColor_);
+}
+
+void GPBox::buildGeometry(int d, qreal s)
+{
+    Q_UNUSED(d)
+    Q_UNUSED(s)
+}
+

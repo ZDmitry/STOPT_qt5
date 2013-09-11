@@ -23,20 +23,32 @@
 
 #include "shape.h"
 
-class Box: public Figure{
+class GPBox: public Shape {
 public:
-	Box(int x, int y, int dx, int dy);
+    GPBox(const QPointF &position, qreal width, qreal height);
 
-    void    resize(int dx, int dy){dx_=dx; dy_=dy;}
-    int     length(){return dx_;}
-    int     width(){return dy_;}
+    void   move(const QRectF &boundRect);
+    QRectF rect() const;
 
-    virtual void moveBy(int x, int y){_x=10-x; _y=10-y;}
+    void   draw(QPainter *painter) const;
+    void   draw() const {;}
 
-    virtual void draw(QPainter&)const;
+    // GPBox uses only innerColor
+    void   updateBrush();
+
+    void   setWidth(qreal w) { box_.setWidth(w); }
+    int    getWidth() const { return box_.width(); }
+
+    void   setHeight(qreal h) { box_.setHeight(h); }
+    int    getHeight() const { return box_.height(); }
 
 private:
-	int dx_,dy_;
+    GPBox(const GPBox &) = delete;
+    GPBox &operator=(const GPBox &) = delete;
+
+    void buildGeometry(int d, qreal s);
+
+    QRectF box_;
 };
 
 #endif //GPBOX_H
