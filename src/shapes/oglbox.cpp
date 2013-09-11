@@ -19,15 +19,33 @@
     02110-1301  USA.
 */
 
-#include "winmain.h"
+#include "shape_derived.h"
 
-#include <QApplication>
+#include <cassert>
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    WinMain w;
-    w.show();
+#include <QPen>
+#include <QBrush>
 
-    return a.exec();
+// BOX
+
+Box::Box(int x, int y,int dx, int dy)
+:Figure(x,y),dx_(dx),dy_(dy)
+{}
+
+void Box::draw(QPainter &hdc) const{
+    QBrush brush(col_);
+    QBrush oldBrush = hdc.brush();
+
+    QPen pen(brush,1,Qt::SolidLine);
+    QPen oldPen = hdc.pen();
+
+    hdc.setPen(pen);
+    hdc.setBrush(brush);
+    hdc.setBackgroundMode(Qt::TransparentMode);
+
+    hdc.drawRect(_x, _y, dx_, dy_);
+
+    hdc.setBackgroundMode(Qt::OpaqueMode);
+    hdc.setPen(oldPen);
+    hdc.setBrush(oldBrush);
 }

@@ -22,24 +22,26 @@
 #ifndef QMAINWIN_H
 #define QMAINWIN_H
 
-#include <QWidget>
-
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QCheckBox>
-
-#include "analitycs/analitycs2d.h"
-#include "analitycs/analitycs3d.h"
+#include <QMainWindow>
+#include "support/stoptdef.h"
 
 namespace Ui {
 class QMainWin;
 }
+
+// forward declaration
+class QCheckBox;
+class QLineEdit;
+
+class GLScene;
+class Radiofield;
 
 class QMainWin : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit QMainWin(QWidget *parent = 0);
+    explicit QMainWin(QWidget* parent = 0);
     ~QMainWin();
 
     void clearCheckedVariants(QList< QCheckBox* > cv);
@@ -61,7 +63,7 @@ public:
 signals:
     void videoModeChanged(STOPT::VMODE);
     void inputComplete();  // input completed, can fill data
-    void dataReady();      // data filled, can render
+    void dataReady(Radiofield*);      // data filled, can render
 
 public slots:
     void videoModeSelect(int i);
@@ -71,9 +73,12 @@ public slots:
     void dimensionsPassed(QString);
 
     void prepareData();
+    void saveScene(QString &fname);
+    void saveData(QString &fname);
 
 private:
     Ui::QMainWin *ui;
+    //GLScene* glScene
 
     // first - radius, second - price
     QList< QPair<QLineEdit*, QLineEdit*> > li2dVariantsIn;

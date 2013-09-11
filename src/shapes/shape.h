@@ -21,25 +21,42 @@
 #ifndef SHAPE_H
 #define SHAPE_H
 
-#pragma once
-
 #include <QPainter>
-#include <QColor>
 
-class Figure
+class Shape
 {
 public:
-    virtual void moveBy(int x, int y);
-    virtual void draw(const QPainter&)const{}
+    virtual ~Shape() {}
 
-    void setColor(const QColor&);
-    QColor getColor() const;
+    // position (by boundingRect)
+    virtual void   move(const QRectF &boundRect) = 0;
+    virtual QRectF rect() const = 0;
+
+    // for 2d shapes (uses QPainter)
+    virtual void draw(QPainter *painter) const = 0;
+    // for 2d shapes (uses GL funcs)
+    virtual void draw() const = 0;
+
+    // brush
+    virtual void updateBrush() = 0;
+
+    void    setInnerColor(const QColor&);
+    QColor  getInnerColor() const;
+
+    void    setOuterColor(const QColor&);
+    QColor  getOuterColor() const;
 
 protected:
-    Figure(int x,int y):col_(QColor(0,0,0)),_x(x),_y(y){}
+    Shape(const QPointF &pos);
+    virtual void buildGeometry(int d, qreal s) = 0;
 
-    QColor col_;
-    int _x,_y;
+    QColor  inColor_;
+    QColor  outColor_;
+    QBrush  brush_;
+    QPointF pos_;
+
+private:
+    QColor randColor();
 };
 
 #endif // SHAPE_H

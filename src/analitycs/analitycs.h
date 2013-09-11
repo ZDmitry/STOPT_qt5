@@ -38,6 +38,8 @@ public:
     Radiofield(int width, int height, int radius, int cost);
     virtual ~Radiofield() {;}
 
+    virtual void generatePoints() = 0;
+
     virtual int  getCount() const { return row_*column_; }
     virtual int  getTotalCost() const { return cost_*count_; }
     virtual bool isFilled() = 0;

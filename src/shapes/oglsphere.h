@@ -18,8 +18,8 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
     02110-1301  USA.
 */
-#ifndef OGL_SHAPE_H
-#define OGL_SHAPE_H
+#ifndef OGLSPHERE_H
+#define OGLSPHERE_H
 
 // OpenGL
 #ifdef Q_OS_MAC
@@ -35,9 +35,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #endif
-
-#pragma once
-
 
 class OglSphere{
 public:
@@ -79,5 +76,5 @@ private:
     double	 ox_, oy_, oz_;
 };
 
-#endif //OGL_SHAPE_H
+#endif //OGLSPHERE_H
 

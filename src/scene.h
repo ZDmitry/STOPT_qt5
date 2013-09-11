@@ -22,10 +22,71 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-class Scene
+#include "support/stoptdef.h"
+
+#include <QGLWidget>
+#include <QTimer>
+
+class Radiofield;
+class Shape;
+class QtLogo;
+
+class GLScene : public QGLWidget
 {
+    Q_OBJECT
+
 public:
-    Scene();
+    GLScene(QWidget *parent = 0);
+    ~GLScene();
+
+    QSize sizeHint() const;
+    int xRotation() const { return xRot_; }
+    int yRotation() const { return yRot_; }
+    int zRotation() const { return zRot_; }
+
+public slots:
+    void setXRotation(int angle);
+    void setYRotation(int angle);
+    void setZRotation(int angle);
+
+    void setVideoMode(STOPT::VMODE vm);
+    void setData(Radiofield* data);
+
+protected:
+    void initializeGL();
+    void paintEvent(QPaintEvent *event);
+    void resizeGL(int width, int height);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void showEvent(QShowEvent *event);
+
+private slots:
+    void animate();
+
+private:
+    void createBubbles(int number);
+    void drawInstructions(QPainter *painter);
+    void setupViewport(int width, int height);
+
+    void render2d(QPaintEvent *event);
+    void render3d(QPaintEvent *event);
+    void render3dProj(QPaintEvent *event);
+
+    STOPT::VMODE vm_;
+    Radiofield*  rf_;
+
+    //GLuint object;
+    int xRot_;
+    int yRot_;
+    int zRot_;
+    QPoint lastPos_;
+
+    QColor colGreen_;
+    QColor colPurple_;
+
+    QtLogo* logo;
+    QList<Shape*> shapes_;
+    QTimer animationTimer;
 };
 
 #endif // SCENE_H

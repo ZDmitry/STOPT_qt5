@@ -21,15 +21,37 @@
 
 #include "shape.h"
 
-void Figure::moveBy(int x, int y){
-    _x+=x;
-    _y+=y;
+void Shape::setInnerColor(const QColor& col) {
+    inColor_=col;
 }
 
-void Figure::setColor(const QColor& col) {
-	col_=col;
+QColor Shape::getInnerColor() const {
+    return inColor_;
 }
 
-QColor Figure::getColor() const {
-    return col_;
+void Shape::setOuterColor(const QColor& col) {
+    outColor_=col;
+}
+
+QColor Shape::getOuterColor() const {
+    return outColor_;
+}
+
+Shape::Shape(const QPointF &pos)
+    : pos_(pos)
+{
+    inColor_ = randColor();
+    outColor_ = randColor();
+
+    //updateBrush();
+}
+
+QColor Shape::randColor()
+{
+    int red = int(205 + 50.0*qrand()/(RAND_MAX+1.0));
+    int green = int(205 + 50.0*qrand()/(RAND_MAX+1.0));
+    int blue = int(205 + 50.0*qrand()/(RAND_MAX+1.0));
+    int alpha = int(91 + 100.0*qrand()/(RAND_MAX+1.0));
+
+    return QColor(red, green, blue, alpha);
 }

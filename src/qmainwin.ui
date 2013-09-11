@@ -17,9 +17,9 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>QMainWin</string>
+   <string>STOPT</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="grlMain">
    <item row="1" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
@@ -43,16 +43,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="0" column="0">
-    <widget class="QGraphicsView" name="viewScene">
-     <property name="minimumSize">
-      <size>
-       <width>480</width>
-       <height>430</height>
-      </size>
-     </property>
-    </widget>
    </item>
    <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -111,7 +101,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>433</width>
+            <width>449</width>
             <height>707</height>
            </rect>
           </property>
@@ -1150,8 +1140,8 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-207</y>
-            <width>433</width>
+            <y>0</y>
+            <width>338</width>
             <height>612</height>
            </rect>
           </property>
@@ -2085,9 +2075,20 @@
      </widget>
     </widget>
    </item>
+   <item row="0" column="0">
+    <widget class="GLScene" name="glScene" native="true"/>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>GLScene</class>
+   <extends>QWidget</extends>
+   <header>scene.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

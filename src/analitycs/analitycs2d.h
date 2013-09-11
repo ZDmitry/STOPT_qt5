@@ -20,15 +20,13 @@
 */
 #ifndef ANALITYCS2D_H
 #define ANALITYCS2D_H
+
 //#include <windows.h> 
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "analitycs.h"
-
-#pragma once
-
 
 class Radiofield2D : public Radiofield {
 public:
@@ -37,6 +35,8 @@ public:
     Radiofield2D(int width, int height);
     Radiofield2D(int width, int height, int radius);
     Radiofield2D(int width, int height, int radius, int cost);
+
+    virtual void generatePoints();
 
     // ptr to vector of ptr - less memory consumption
     std::vector< std::vector< STOPT::POINT > > getPointsPacked();

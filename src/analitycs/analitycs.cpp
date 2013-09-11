@@ -24,8 +24,8 @@
 using namespace std;
 using namespace STOPT;
 
-Radiofield::Radiofield(int width, int height, int radius, int cost)
-:width_(width), height_(height), radius_(radius), cost_(cost)
+Radiofield::Radiofield(int width, int height, int radius, int cost) :
+    width_(width), height_(height), radius_(radius), cost_(cost)
 {
     am_ = STOPT::A_STD;
     vm_ = STOPT::V_2D;

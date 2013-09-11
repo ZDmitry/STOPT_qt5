@@ -18,14 +18,12 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
     02110-1301  USA.
 */
-#ifndef SHAPE_DERIVED_H
-#define SHAPE_DERIVED_H
+#ifndef OGLBOX_H
+#define OGLBOX_H
 
 #include "shape.h"
 
-#pragma once
-
-class Circle: public Figure{
+class Circle: public Shape {
 public:
 	Circle();
 	Circle(int x, int y, int r,int n);
@@ -68,4 +66,4 @@ private:
 	int dx_,dy_;
 };
 
-#endif //SHAPE_DERIVED_H
+#endif //OGLBOX_H

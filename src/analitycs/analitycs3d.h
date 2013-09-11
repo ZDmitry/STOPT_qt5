@@ -22,14 +22,11 @@
 #define ANALITYCS3D_H
 
 //#include <windows.h> 
-#include "shapes/ogl_shape.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 #include "analitycs.h"
-
-#pragma once
 
 
 class Radiofield3D : public Radiofield {
@@ -40,6 +37,8 @@ public:
     Radiofield3D(int width, int height, int lenght);
     Radiofield3D(int width, int height, int lenght, int radius);
     Radiofield3D(int width, int height, int lenght, int radius, int cost);
+
+    virtual void generatePoints();
 
     // ptr to vector of ptr - less memory consumption
     const std::vector< std::vector< std::vector< STOPT::POINT3D >* >* >* getPoints(){ return points_; }

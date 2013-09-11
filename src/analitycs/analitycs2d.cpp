@@ -27,22 +27,22 @@ using namespace STOPT;
 /// Radiofield2D  CTOS
 /////////////////////////////////////////
 
-Radiofield2D::Radiofield2D()
-    :Radiofield(0, 0, 0, 0), dynGenerated_(false)
+Radiofield2D::Radiofield2D() :
+    Radiofield(0, 0, 0, 0), dynGenerated_(false)
 {
     points_  = nullptr;
     support_ = nullptr;
 }
 
-Radiofield2D::Radiofield2D(int width, int height)
-    :Radiofield(width, height, 0, 0), dynGenerated_(false)
+Radiofield2D::Radiofield2D(int width, int height) :
+    Radiofield(width, height, 0, 0), dynGenerated_(false)
 {
     points_  = nullptr;
     support_ = nullptr;
 }
 
-Radiofield2D::Radiofield2D(int width, int height, int radius)
-    :Radiofield(width, height, radius, 0), dynGenerated_(false)
+Radiofield2D::Radiofield2D(int width, int height, int radius) :
+    Radiofield(width, height, radius, 0), dynGenerated_(false)
 {
     points_  = nullptr;
     support_ = nullptr;
@@ -50,13 +50,18 @@ Radiofield2D::Radiofield2D(int width, int height, int radius)
     buildPoints(width, height, radius);
 }
 
-Radiofield2D::Radiofield2D(int width, int height, int radius, int cost)
-    :Radiofield(width, height, radius, cost), dynGenerated_(false)
+Radiofield2D::Radiofield2D(int width, int height, int radius, int cost) :
+    Radiofield(width, height, radius, cost), dynGenerated_(false)
 {
     points_  = nullptr;
     support_ = nullptr;
 
-    Radiofield2D::buildPoints(width, height, radius);
+    buildPoints(width, height, radius);
+}
+
+void Radiofield2D::generatePoints()
+{
+    buildPoints(width_, height_, radius_);
 }
 
 /////////////////////////////////////////

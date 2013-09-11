@@ -22,6 +22,11 @@
 #include "qmainwin.h"
 #include "ui_qmainwin.h"
 
+#include "scene.h"
+#include "analitycs/analitycs2d.h"
+#include "analitycs/analitycs3d.h"
+#include "support/iodata.h"
+
 using namespace std;
 
 const QString QMainWin::RO_DISABLED_STYLE = QString("background-color: rgb(221, 221, 221);");
@@ -203,7 +208,14 @@ QMainWin::QMainWin(QWidget *parent) :
     }
 
     connect(ui->btnRender, SIGNAL(pressed()), this, SIGNAL(inputComplete()));
+
+
     connect(this, SIGNAL(inputComplete()), this, SLOT(prepareData()));
+
+    //ui->gvScene->setViewport(new GLScene());
+    // Scene connections
+    connect(this, SIGNAL(videoModeChanged(STOPT::VMODE)), ui->glScene, SLOT(setVideoMode(STOPT::VMODE)));
+    connect(this, SIGNAL(dataReady(Radiofield*)), ui->glScene, SLOT(setData(Radiofield*)));
 }
 
 void QMainWin::clearFields(QWidget* tab)
@@ -345,6 +357,8 @@ void QMainWin::prepareData()
 {
     int n = 0;
 
+    Radiofield* best = nullptr;
+
     QListIterator< QPair<QLineEdit*, QLineEdit*> > it = li2dVariantsIn;
     QListIterator< QPair<QLineEdit*, QLineEdit*> > jt = li2dVariantsOut;
 
@@ -391,24 +405,99 @@ void QMainWin::prepareData()
         ui->tb2dOverlap->setText(QString::number(bestOverlap));
         ui->tb2dSquare->setText(QString::number(bestSquare));
 
+        clearCheckedVariants(li2dVariantsBest);
         li2dVariantsBest.at(bestVariant)->setCheckState(Qt::Checked);
         ui->tb2dOptimalCost->setText(QString::number(bestCost));
         ui->tb2dOptimalCount->setText(QString::number(bestCount));
         ui->tb2dOptimalRadius->setText(QString::number(bestRadius));
 
+        best = new Radiofield2D();
+        Radiofield* tmp  = rfb;
+        rfb = dynamic_cast<Radiofield2D*>(best); best = tmp;
+        tmp = nullptr;
+
         foreach(Radiofield2D* f, (*rf)) {
             delete f;
         }
         delete rf;
-
     }
     else if (ui->twVideoMode->currentWidget() ==
              ui->tab3dMode) {
 
+        it = li3dVariantsIn;
+        jt = li3dVariantsOut;
 
+        n = numOfFilledVariants(li3dVariantsIn);
+
+        int height = ui->tb3dHeight->text().toInt();
+        int width  = ui->tb3dWidth->text().toInt();
+        int lenght = ui->tb3dLength->text().toInt();
+
+        std::vector<Radiofield3D* >* rf = new std::vector<Radiofield3D* >();
+        rf->reserve(n);
+
+        for (int i=0; i<n; i++) {
+            QPair<QLineEdit*, QLineEdit*> fl = it.next();
+            QPair<QLineEdit*, QLineEdit*> sl = jt.next();
+
+            int radius = fl.first->text().toInt();
+            int price  = fl.second->text().toInt();
+
+            // generate points for this variant
+            rf->push_back( new Radiofield3D(width, height, lenght, radius, price) );
+            Radiofield3D*& rfe = rf->at(i);
+            // get calculated values:
+            QString cost = QString::number(rfe->getTotalCost());
+            sl.first->setText(cost);
+            QString overlap = QString::number(rfe->effectiveVolume());
+            sl.second->setText(overlap);
+        }
+
+        int bestVariant = Radiofield3D::getOptimalVariant(rf);
+        Radiofield3D*& rfb = rf->at(bestVariant);
+        int bestCost    = rfb->getTotalCost();
+        int bestCount   = rfb->getCount();
+        int bestRadius  = rfb->getRadius();
+        int bestVolume  = rfb->filledVolume();
+
+        double bestOverlap = rfb->effectiveVolume();
+        if ( bestOverlap > 1.f ) ui->pb3dCoverage->setValue(100);
+        else {
+            ui->pb3dCoverage->setValue( qRound(bestOverlap*100) );
+        }
+        ui->tb3dOverlap->setText(QString::number(bestOverlap));
+        ui->tb3dVolume->setText(QString::number(bestVolume));
+
+        clearCheckedVariants(li3dVariantsBest);
+        li3dVariantsBest.at(bestVariant)->setCheckState(Qt::Checked);
+        ui->tb3dOptimalCost->setText(QString::number(bestCost));
+        ui->tb3dOptimalCount->setText(QString::number(bestCount));
+        ui->tb3dOptimalRadius->setText(QString::number(bestRadius));
+
+        best = new Radiofield3D();
+        Radiofield* tmp  = rfb;
+        rfb = dynamic_cast<Radiofield3D*>(best); best = tmp;
+        tmp = nullptr;
+
+        foreach(Radiofield3D* f, (*rf)) {
+            delete f;
+        }
+        delete rf;
     }
 
-    emit dataReady();
+    //if ( best != nullptr ) delete best;
+
+    emit dataReady(best);
+}
+
+void QMainWin::saveScene(QString &fname)
+{
+    ui->glScene->grabFrameBuffer().save(fname);
+}
+
+void QMainWin::saveData(QString &fname)
+{
+
 }
 
 bool QMainWin::eventFilter(QObject *target, QEvent *event)
@@ -472,6 +561,7 @@ void QMainWin::videoModeSelect(int i)
         ui->pb2dCoverage->setValue(0);
         ui->chb2dInteractive->setVisible(true);
         ui->chb3dProjections->setVisible(false);
+
         emit videoModeChanged(STOPT::V_2D);
     }
     else if (i == 1) {
@@ -479,6 +569,7 @@ void QMainWin::videoModeSelect(int i)
         ui->pb3dCoverage->setValue(0);
         ui->chb2dInteractive->setVisible(false);
         ui->chb3dProjections->setVisible(true);
+
         emit videoModeChanged(STOPT::V_3D);
     }
 

@@ -18,16 +18,25 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
     02110-1301  USA.
 */
+#ifndef GPBOX_H
+#define GPBOX_H
 
-#include "winmain.h"
+#include "shape.h"
 
-#include <QApplication>
+class Box: public Figure{
+public:
+	Box(int x, int y, int dx, int dy);
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    WinMain w;
-    w.show();
+    void    resize(int dx, int dy){dx_=dx; dy_=dy;}
+    int     length(){return dx_;}
+    int     width(){return dy_;}
 
-    return a.exec();
-}
+    virtual void moveBy(int x, int y){_x=10-x; _y=10-y;}
+
+    virtual void draw(QPainter&)const;
+
+private:
+	int dx_,dy_;
+};
+
+#endif //GPBOX_H

@@ -29,36 +29,41 @@ using namespace STOPT;
 /// Radiofield3D  CTOS
 /////////////////////////////////////////
 
-Radiofield3D::Radiofield3D()
-    :Radiofield(0, 0, 0, 0), lenght_(0)
+Radiofield3D::Radiofield3D() :
+    Radiofield(0, 0, 0, 0), lenght_(0)
 {
     points_ = new  vector< vector< vector< POINT3D >* >* >();
 }
 
-Radiofield3D::Radiofield3D(int width, int height)
-    :Radiofield(width, height, 0, 0), lenght_(0)
+Radiofield3D::Radiofield3D(int width, int height) :
+    Radiofield(width, height, 0, 0), lenght_(0)
 {
     points_ = new  vector< vector< vector< POINT3D >* >* >();
 }
 
-Radiofield3D::Radiofield3D(int width, int height, int lenght)
-    :Radiofield(width, height, 0, 0), lenght_(lenght)
+Radiofield3D::Radiofield3D(int width, int height, int lenght) :
+    Radiofield(width, height, 0, 0), lenght_(lenght)
 {
     points_ = new  vector< vector< vector< POINT3D >* >* >();
 }
 
-Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius)
-    :Radiofield(width, height, radius, 0), lenght_(lenght)
+Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius) :
+    Radiofield(width, height, radius, 0), lenght_(lenght)
 {
     points_ = new  vector< vector< vector< POINT3D >* >* >();
-    Radiofield3D::buildPoints(height, width, lenght, radius);
+    buildPoints(height, width, lenght, radius);
 }
 
-Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius, int cost)
-    :Radiofield(width, height, radius, cost), lenght_(lenght)
+Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius, int cost) :
+    Radiofield(width, height, radius, cost), lenght_(lenght)
 {
     points_ = new  vector< vector< vector< POINT3D >* >* >();
-    Radiofield3D::buildPoints(height, width, lenght, radius);
+    buildPoints(height, width, lenght, radius);
+}
+
+void Radiofield3D::generatePoints()
+{
+    buildPoints(height_, width_, lenght_, radius_);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -94,7 +99,7 @@ Radiofield3D& Radiofield3D::operator=(const Radiofield3D& r)
 // calculate block count by given lenght and radius
 int Radiofield3D::blockCount(int lenght, int radius)
 {
-	int res=0;
+    int res = 0;
 	double a,n,p;
 	p=n=0;
 
@@ -190,7 +195,7 @@ void Radiofield3D::buildPoints(int height, int width, int lenght, int radius)
         for(int j=0; j<row_; j++)    // put y - height
         {
             packedRow->push_back( new vector<POINT3D>(column_) );
-            vector< POINT3D >*& packedColumn = packedRow->at(row_ - j - 1);
+            vector< POINT3D >*& packedColumn = packedRow->at(j);
             packedColumn->reserve(column_);
 
             for(int i=0; i<column_; i++) // put x - width

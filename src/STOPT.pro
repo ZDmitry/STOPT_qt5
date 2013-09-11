@@ -1,37 +1,52 @@
 #=====================================================================#
 #    This file is part of STOPT project.                              #
 #                                                                     #
-#    Copyright 2012      by Dmitry Zagnoyko <hiroshidi@gmail.com>     #
+#    Copyright 2012-2013    by Dmitry Zagnoyko <hiroshidi@gmail.com>  #
 #=====================================================================#
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-QMAKE_CXXFLAGS += -std=gnu++0x -Wno-narrowing
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets opengl
+QMAKE_CXXFLAGS += -std=gnu++0x -Wno-narrowing -Wno-reorder
 
 TARGET = STOPT
 
 SOURCES += main.cpp\
     qmainwin.cpp \
     scene.cpp \
-    shapes/shape_derived.cpp \
     shapes/shape.cpp \
-    shapes/ogl_shape.cpp \
     support/iodata.cpp \
     analitycs/analitycs3d.cpp \
     analitycs/analitycs2d.cpp \
-    analitycs/analitycs.cpp
+    analitycs/analitycs.cpp \
+    bubble.cpp \
+    qtlogo.cpp \
+    support/glrendersupport.cpp \
+    shapes/gpcircle.cpp \
+    #shapes/oglsphere.cpp \
+    #shapes/oglbox.cpp \
+    #shapes/gpbox.cpp
+    winmain.cpp
 
 HEADERS  += qmainwin.h \
     analitycs3d.h \
     scene.h \
-    shapes/shape_derived.h \
     shapes/shape.h \
-    shapes/ogl_shape.h \
     support/stoptdef.h \
     support/iodata.h \
     analitycs/analitycs3d.h \
     analitycs/analitycs2d.h \
-    analitycs/analitycs.h
+    analitycs/analitycs.h \
+    bubble.h \
+    qtlogo.h \
+    support/glrendersupport.h \
+    shapes/gpcircle.h \
+    #shapes/oglsphere.h \
+    #shapes/oglbox.h \
+    #shapes/gpbox.h
+    winmain.h
 
 FORMS  += qmainwin.ui
+
+RESOURCES += \
+    stopt.qrc

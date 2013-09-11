@@ -23,9 +23,7 @@
 
 #include <vector>
 #include "stoptdef.h"
-#include "shapes/shape.h"
-
-#pragma once
+//#include "shapes/shape.h"
 
 class IOSystem {
 public:

@@ -18,16 +18,36 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
     02110-1301  USA.
 */
+#ifndef GPCIRCLE_H
+#define GPCIRCLE_H
 
-#include "winmain.h"
+#include "shape.h"
 
-#include <QApplication>
+class GPCircle: public Shape {
+public:
+    GPCircle(const QPointF &position, qreal radius, int num);
 
-int main(int argc, char *argv[])
-{
-    QApplication a(argc, argv);
-    WinMain w;
-    w.show();
+    void   move(const QRectF &boundRect);
+    QRectF rect() const;
 
-    return a.exec();
-}
+    void   draw(QPainter *painter) const;
+    void   draw() const {;}
+
+    void   updateBrush();
+
+    void   setNumber(int n){ number_=n; }
+    int    getNumber() const { return number_; }
+
+    void   setRadius(int r){ radius_=r; }
+    int    getRadius() const { return radius_; }
+
+    GPCircle&  operator=(const GPCircle& r);
+
+private:
+    void buildGeometry(int d, qreal s);
+
+    qreal   radius_;
+    int     number_;
+};
+
+#endif //GPCIRCLE_H
