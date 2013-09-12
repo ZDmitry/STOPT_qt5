@@ -42,13 +42,8 @@ public:
     qreal      zCoord() const;
     const QVector3D* position() { return pos3d_; }
 
-    // nothing to do with simple paint
-    void       draw(QPainter *painter) const {}
     // OpenGL instructions
     void       draw() const;
-
-    // nothing to do
-    void       updateBrush(){}
 
     void       setRadius(qreal r)  { radius_=r; }
     qreal      getRadius() const { return radius_; }
@@ -57,7 +52,10 @@ private:
     OGLSphere(const OGLSphere &) = delete;
     OGLSphere &operator=(const OGLSphere &) = delete;
 
-    void       buildGeometry(int d, qreal s){}
+    // OGLSphere uses only outerColor
+    void       updateBrush();
+
+    void       buildGeometry(){}
 
     qreal      radius_;
     bool       wireframe_;

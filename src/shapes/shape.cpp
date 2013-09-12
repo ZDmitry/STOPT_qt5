@@ -23,6 +23,7 @@
 
 void Shape::setInnerColor(const QColor& col) {
     inColor_=col;
+    updateBrush();
 }
 
 QColor Shape::getInnerColor() const {
@@ -31,6 +32,7 @@ QColor Shape::getInnerColor() const {
 
 void Shape::setOuterColor(const QColor& col) {
     outColor_=col;
+    updateBrush();
 }
 
 QColor Shape::getOuterColor() const {

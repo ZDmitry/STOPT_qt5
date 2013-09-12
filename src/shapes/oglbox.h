@@ -26,11 +26,14 @@
 #include <qopengl.h>
 
 class QVector3D;
+class GLRenderSupport;
+struct GLGeometry;
 
 class OGLBox: public Shape {
 public:
     OGLBox(const QPointF   &position, qreal z, qreal width, qreal height, qreal lenght);
     OGLBox(const QVector3D &position, qreal width, qreal height, qreal lenght);
+    OGLBox(const QVector3D &position, const QVector3D &dimensions);
     ~OGLBox();
 
     // nothing to do
@@ -44,13 +47,8 @@ public:
     const QVector3D* dimensions() { return dim3d_; }
     void       setDimensions(const QVector3D &newDim);
 
-    // nothing to do with simple paint
-    void       draw(QPainter *painter) const {}
     // OpenGL instructions
     void       draw() const;
-
-    // nothing to do
-    void       updateBrush(){}
 
     qreal      getWidth() const;
     void       setWidth(qreal w);
@@ -65,14 +63,22 @@ private:
     OGLBox(const OGLBox &) = delete;
     OGLBox &operator=(const OGLBox &) = delete;
 
-    void       buildGeometry(int d, qreal s){}
+    // OGLBox uses only outerColor
+    void       updateBrush();
+
+    void       buildGeometry();
 
     bool       wireframe_;
     // coord      x, y, z
     QVector3D  *pos3d_;
     // dimensions x, y, z
     QVector3D  *dim3d_;
-    GLfloat    *fColor_; //[4]
+
+    QList<GLRenderSupport *>  parts_;
+    GLGeometry               *geom_;
+
+    static const int   DIVISIONS;
+    static const qreal SCALE;
 };
 
 #endif //OGLBOX_H

@@ -31,9 +31,6 @@ public:
     QRectF rect() const;
 
     void   draw(QPainter *painter) const;
-    void   draw() const {;}
-
-    void   updateBrush();
 
     void   setNumber(int n){ number_=n; }
     int    getNumber() const { return number_; }
@@ -45,7 +42,7 @@ private:
     GPCircle(const GPCircle &) = delete;
     GPCircle &operator=(const GPCircle &) = delete;
 
-    void buildGeometry(int d, qreal s);
+    void    updateBrush();
 
     qreal   radius_;
     int     number_;

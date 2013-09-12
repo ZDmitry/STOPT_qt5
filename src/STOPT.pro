@@ -19,8 +19,6 @@ SOURCES += main.cpp\
     analitycs/analitycs3d.cpp \
     analitycs/analitycs2d.cpp \
     analitycs/analitycs.cpp \
-    bubble.cpp \
-    qtlogo.cpp \
     support/glrendersupport.cpp \
     shapes/gpcircle.cpp \
     shapes/oglsphere.cpp \
@@ -37,8 +35,6 @@ HEADERS  += qmainwin.h \
     analitycs/analitycs3d.h \
     analitycs/analitycs2d.h \
     analitycs/analitycs.h \
-    bubble.h \
-    qtlogo.h \
     support/glrendersupport.h \
     shapes/gpcircle.h \
     shapes/oglsphere.h \

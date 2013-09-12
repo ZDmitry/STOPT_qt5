@@ -75,12 +75,6 @@ void GPBox::draw(QPainter *painter) const
 
 void GPBox::updateBrush()
 {
-    brush_ = QBrush(inColor_);
-}
-
-void GPBox::buildGeometry(int d, qreal s)
-{
-    Q_UNUSED(d)
-    Q_UNUSED(s)
+    brush_ = QBrush(outColor_);
 }
 

@@ -24,11 +24,13 @@
 #include "analitycs/analitycs2d.h"
 #include "analitycs/analitycs3d.h"
 
-#include "shapes/gpcircle.h" //"bubble.h"
-#include "qtlogo.h"
+#include "shapes/gpcircle.h"
+#include "shapes/oglbox.h"
 
 #include <QMouseEvent>
 #include <QTime>
+
+#include <QVector3D>
 
 #include <math.h>
 #include <stdlib.h>
@@ -65,8 +67,11 @@ void GLScene::initializeGL()
 {
     glEnable(GL_MULTISAMPLE);
 
-    logo = new QtLogo(this);
-    logo->setColor(colGreen_.dark());
+    QVector3D pos(0,0,0);
+    QVector3D dims(100,200,300);
+
+    box_ = new OGLBox(pos,dims);
+    box_->setOuterColor(colGreen_.dark());
 }
 
 void GLScene::setupViewport(int width, int height)
@@ -100,6 +105,7 @@ void GLScene::createBubbles(int number)
 GLScene::~GLScene()
 {
     if ( rf_ != nullptr ) delete rf_;
+    delete box_;
     qDeleteAll(shapes_);
 }
 
@@ -291,7 +297,7 @@ void GLScene::render3d(QPaintEvent *event)
     glRotatef(yRot_ / 16.0, 0.0, 1.0, 0.0);
     glRotatef(zRot_ / 16.0, 0.0, 0.0, 1.0);
 
-    logo->draw();
+    box_->draw();
 
     // rollback scene
     glShadeModel(GL_FLAT);

@@ -87,9 +87,3 @@ void GPCircle::updateBrush()
 
     brush_ = QBrush(grad);
 }
-
-void GPCircle::buildGeometry(int d, qreal s)
-{
-    Q_UNUSED(d)
-    Q_UNUSED(s)
-}

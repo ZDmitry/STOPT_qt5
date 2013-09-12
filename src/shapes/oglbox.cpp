@@ -28,6 +28,9 @@
 #include <GL/glu.h>
 #include "support/glrendersupport.h"
 
+const int   OGLBox::DIVISIONS = 64;
+const qreal OGLBox::SCALE     = 1.0;
+
 static inline void qSetColor(float colorVec[], QColor c)
 {
     colorVec[0] = c.redF();
@@ -37,38 +40,76 @@ static inline void qSetColor(float colorVec[], QColor c)
 }
 
 OGLBox::OGLBox(const QPointF   &position, qreal z, qreal width, qreal height, qreal lenght)
-    : Shape(position)
+    : Shape( QPointF(position.x(), position.y()) ),
+      geom_( new GLGeometry())
 {
     pos3d_ = new QVector3D(pos_.x(),pos_.y(), z);
     dim3d_ = new QVector3D(width, height, lenght);
     wireframe_ = false;
 
-    fColor_ = new GLfloat[4];
-    qSetColor(fColor_, QColor(Qt::darkGray));
+    outColor_.setNamedColor( QColor(Qt::darkGray).name() );
+    updateBrush();
 
-    // alpha got from innerColor
-    fColor_[4] = inColor_.alphaF();
+    buildGeometry();
 }
 
 OGLBox::OGLBox(const QVector3D &position, qreal width, qreal height, qreal lenght)
-    : Shape( QPointF(position.x(), position.y()) )
+    : Shape( QPointF(position.x(), position.y()) ),
+      geom_( new GLGeometry() )
 {
     pos3d_ = new QVector3D(position.x(), position.y(), position.z());
     dim3d_ = new QVector3D(width, height, lenght);
     wireframe_ = false;
 
-    fColor_ = new GLfloat[4];
-    qSetColor(fColor_, QColor(Qt::darkGray));
+    outColor_.setNamedColor( QColor(Qt::darkGray).name() );
+    updateBrush();
 
-    // alpha got from innerColor
-    fColor_[4] = inColor_.alphaF();
+    buildGeometry();
+}
+
+OGLBox::OGLBox(const QVector3D &position, const QVector3D &dimensions)
+    : Shape( QPointF(position.x(), position.y()) ),
+      geom_( new GLGeometry() )
+{
+    pos3d_ = new QVector3D(position.x(),position.y(), position.z());
+    dim3d_ = new QVector3D(dimensions.x(), dimensions.y(), dimensions.z());
+    wireframe_ = false;
+
+    outColor_.setNamedColor( QColor(Qt::darkGray).name() );
+    updateBrush();
+
+    buildGeometry();
+}
+
+void  OGLBox::buildGeometry()
+{
+   qreal width  = dim3d_->x() * SCALE;
+   qreal height = dim3d_->y() * SCALE;
+   qreal depth  = dim3d_->z() * SCALE;
+
+   GLCube cube(geom_, width, height, depth);
+
+   QVector3D z(0.0, 0.0, 1.0);
+   cube.rotate(45.0, z);
+
+   parts_ << cube.parts;
+
+   geom_->finalize();
 }
 
 OGLBox::~OGLBox()
 {
     delete pos3d_;
     delete dim3d_;
-    delete[] fColor_;
+    delete geom_;
+
+    qDeleteAll(parts_);
+}
+
+void OGLBox::updateBrush()
+{
+    for (int i = 0; i < parts_.count(); ++i)
+        qSetColor(parts_[i]->faceColor, outColor_);
 }
 
 void OGLBox::move(const QVector3D &newPos)
@@ -113,32 +154,15 @@ void OGLBox::setDimensions(const QVector3D &newDim)
 
 void OGLBox::draw() const
 {
-    GLUquadric* params = gluNewQuadric();
-    gluQuadricTexture(params,GL_TRUE);
+    geom_->loadArrays();
 
-    glPushMatrix();
-        //glScalef(s,s,s);
-        //glTranslatef(x,y,z);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, fColor_);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_NORMAL_ARRAY);
 
-        //glMaterialfv(GL_FRONT,GL_AMBIENT,make_vect(0.2473f, 0.1995f, 0.0745f, 1.0f));
-        //glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,make_vect(r,g,b,1.f));
-        //glMaterialfv(GL_FRONT,GL_SPECULAR,make_vect(0.6283f, 0.5558f, 0.3661f, 1.0f));
-        //glMaterialfv(GL_FRONT,GL_EMISSION,make_vect(0.0f, 0.0f, 0.0f, 0.0f));
-        //glMaterialf(GL_FRONT,GL_SHININESS,3.0f);
+    for (int i = 0; i < parts_.count(); ++i)
+        parts_[i]->draw();
 
-        if (wireframe_)
-            //glutWireSphere(s,60,60);
-            gluQuadricDrawStyle(params,GLU_LINE);
-        else
-            //glutSolidSphere(s,60,60);
-            gluQuadricDrawStyle(params,GLU_FILL);
-
-        //args: [1]GLUquadric*, [2]GLdouble, [3]GLint, [4]GLint
-        //gluSphere(params, radius_*1.16f, SPHERE_SLICE, SPHERE_STACK);
-
-    glPopMatrix();
-
-    gluDeleteQuadric(params);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
 
 }

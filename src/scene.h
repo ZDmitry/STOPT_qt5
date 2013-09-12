@@ -29,7 +29,7 @@
 
 class Radiofield;
 class Shape;
-class QtLogo;
+class OGLBox;
 
 class GLScene : public QGLWidget
 {
@@ -84,7 +84,7 @@ private:
     QColor colGreen_;
     QColor colPurple_;
 
-    QtLogo* logo;
+    OGLBox* box_;
     QList<Shape*> shapes_;
     QTimer animationTimer;
 };

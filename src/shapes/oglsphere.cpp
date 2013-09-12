@@ -42,11 +42,9 @@ OGLSphere::OGLSphere(const QPointF &position, qreal z, qreal radius)
     pos3d_ = new QVector3D(pos_.x(),pos_.y(), z);
     wireframe_ = false;
 
+    // uses innerColor
     fColor_ = new GLfloat[4];
-    qSetColor(fColor_, QColor(Qt::darkGray));
-
-    // alpha got from innerColor
-    fColor_[4] = inColor_.alphaF();
+    qSetColor(fColor_, outColor_);
 }
 
 OGLSphere::OGLSphere(const QVector3D &position, qreal radius)
@@ -57,10 +55,7 @@ OGLSphere::OGLSphere(const QVector3D &position, qreal radius)
     wireframe_ = false;
 
     fColor_ = new GLfloat[4];
-    qSetColor(fColor_, QColor(Qt::darkGray));
-
-    // alpha got from innerColor
-    fColor_[4] = inColor_.alphaF();
+    qSetColor(fColor_, outColor_);
 }
 
 OGLSphere::~OGLSphere()
@@ -85,6 +80,11 @@ QRectF OGLSphere::rect() const
 qreal OGLSphere::zCoord() const
 {
     return pos3d_->z();
+}
+
+void OGLSphere::updateBrush()
+{
+    qSetColor(fColor_, outColor_);
 }
 
 void OGLSphere::draw() const

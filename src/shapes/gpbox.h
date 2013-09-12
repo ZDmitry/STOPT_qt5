@@ -31,10 +31,6 @@ public:
     QRectF rect() const;
 
     void   draw(QPainter *painter) const;
-    void   draw() const {;}
-
-    // GPBox uses only innerColor
-    void   updateBrush();
 
     void   setWidth(qreal w) { box_.setWidth(w); }
     int    getWidth() const { return box_.width(); }
@@ -46,7 +42,8 @@ private:
     GPBox(const GPBox &) = delete;
     GPBox &operator=(const GPBox &) = delete;
 
-    void buildGeometry(int d, qreal s);
+    // GPBox uses only outerColor
+    void  updateBrush();
 
     QRectF box_;
 };

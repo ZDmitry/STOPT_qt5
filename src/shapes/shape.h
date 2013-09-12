@@ -33,22 +33,24 @@ public:
     virtual QRectF rect() const = 0;
 
     // for 2d shapes (uses QPainter)
-    virtual void draw(QPainter *painter) const = 0;
+    virtual void draw(QPainter *painter) const { Q_UNUSED(painter) }
     // for 2d shapes (uses GL funcs)
-    virtual void draw() const = 0;
-
-    // brush
-    virtual void updateBrush() = 0;
+    virtual void draw() const {}
 
     void    setInnerColor(const QColor&);
     QColor  getInnerColor() const;
 
+    // this is main color
     void    setOuterColor(const QColor&);
     QColor  getOuterColor() const;
 
 protected:
     Shape(const QPointF &pos);
-    virtual void buildGeometry(int d, qreal s) = 0;
+    virtual void buildGeometry(){}
+
+    // call update brush after
+    // each color changes
+    virtual void updateBrush() = 0;
 
     QColor  inColor_;
     QColor  outColor_;

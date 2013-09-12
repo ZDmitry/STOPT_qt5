@@ -1,3 +1,24 @@
+/*
+    This file is part of STOPT project.
+
+    Copyright 2012-2013       by Dmitry Zagnoyko <hiroshidi@gmail.com>
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+    02110-1301  USA.
+*/
+
 #include "glrendersupport.h"
 
 #include <QMatrix4x4>
@@ -13,6 +34,14 @@ static inline void qSetColor(float colorVec[], QColor c)
     colorVec[1] = c.greenF();
     colorVec[2] = c.blueF();
     colorVec[3] = c.alphaF();
+}
+
+static inline QVector<QVector3D> extrude(const QVector<QVector3D> &vertices, qreal depth)
+{
+    QVector<QVector3D> extr = vertices;
+    for (int v = 0; v < extr.count(); ++v)
+        extr[v].setZ(extr[v].z() - depth);
+    return extr;
 }
 
 ///  GLGeometry struct
@@ -148,4 +177,39 @@ void GLRenderSupport::addQuad(const QVector3D &a, const QVector3D &b,  const QVe
         geom->appendFaceted(d, norm);
         count += 3;
     }
+}
+
+///  GLCube class
+////////////////////////////////////////////
+
+GLCube::GLCube(GLGeometry *g, qreal width, qreal height, qreal depth)
+{
+    enum { bl, br, tr, tl };
+    GLRenderSupport *fb = new GLRenderSupport(g);
+    fb->setSmoothing(GLRenderSupport::Faceted);
+
+    // front face
+    QVector<QVector3D> r(4);
+    r[br].setX(width);
+    r[tr].setX(width);
+    r[tr].setY(height);
+    r[tl].setY(height);
+    QVector3D adjToCenter(-width / 2.0, -height / 2.0, depth / 2.0);
+    for (int i = 0; i < 4; ++i)
+        r[i] += adjToCenter;
+    fb->addQuad(r[bl], r[br], r[tr], r[tl]);
+
+    // back face
+    QVector<QVector3D> s = extrude(r, depth);
+    fb->addQuad(s[tl], s[tr], s[br], s[bl]);
+
+    // side faces
+    GLRenderSupport *sides = new GLRenderSupport(g);
+    sides->setSmoothing(GLRenderSupport::Faceted);
+    sides->addQuad(s[bl], s[br], r[br], r[bl]);
+    sides->addQuad(s[br], s[tr], r[tr], r[br]);
+    sides->addQuad(s[tr], s[tl], r[tl], r[tr]);
+    sides->addQuad(s[tl], s[bl], r[bl], r[tl]);
+
+    parts << fb << sides;
 }
