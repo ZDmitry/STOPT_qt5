@@ -77,7 +77,6 @@ private:
     QList<GLRenderSupport *>  parts_;
     GLGeometry               *geom_;
 
-    static const int   DIVISIONS;
     static const qreal SCALE;
 };
 

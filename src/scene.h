@@ -54,6 +54,7 @@ public slots:
 
 protected:
     void initializeGL();
+//  void paintGL();
     void paintEvent(QPaintEvent *event);
     void resizeGL(int width, int height);
     void mousePressEvent(QMouseEvent *event);
@@ -64,18 +65,18 @@ private slots:
     void animate();
 
 private:
-    void createBubbles(int number);
+    void createHotspots(int number);
     void drawInstructions(QPainter *painter);
     void setupViewport(int width, int height);
 
-    void render2d(QPaintEvent *event);
+    void render2d(QPaintEvent *event, QPainter &painter);
     void render3d(QPaintEvent *event);
     void render3dProj(QPaintEvent *event);
 
     STOPT::VMODE vm_;
     Radiofield*  rf_;
 
-    //GLuint object;
+    GLuint object;
     int xRot_;
     int yRot_;
     int zRot_;

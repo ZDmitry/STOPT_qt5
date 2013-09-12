@@ -42,8 +42,9 @@
 GLScene::GLScene(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
-    rf_ = nullptr;
-    vm_ = STOPT::V_2D;
+    rf_  = nullptr;
+    box_ = nullptr;
+    vm_  = STOPT::V_2D;
 
     QTime midnight(0, 0, 0);
     qsrand(midnight.secsTo(QTime::currentTime()));
@@ -68,7 +69,7 @@ void GLScene::initializeGL()
     glEnable(GL_MULTISAMPLE);
 
     QVector3D pos(0,0,0);
-    QVector3D dims(100,200,300);
+    QVector3D dims(1,2,3);
 
     box_ = new OGLBox(pos,dims);
     box_->setOuterColor(colGreen_.dark());
@@ -91,7 +92,7 @@ void GLScene::setupViewport(int width, int height)
     glMatrixMode(GL_MODELVIEW);
 }
 
-void GLScene::createBubbles(int number)
+void GLScene::createHotspots(int number)
 {
     for (int i = 0; i < number; ++i) {
         QPointF position(width()*(0.1 + (0.8*qrand()/(RAND_MAX+1.0))),
@@ -142,6 +143,8 @@ void GLScene::setVideoMode(STOPT::VMODE vm)
 {
     vm_ = vm;
     if (rf_ != nullptr) rf_->setVideoMode(vm);
+
+    update();
 }
 
 void GLScene::setData(Radiofield *data)
@@ -214,65 +217,12 @@ void GLScene::paintEvent(QPaintEvent *event)
 {
     makeCurrent();
 
-    if ( vm_ == STOPT::V_3D ){
-        render3d(event);
-    }
-    else if ( vm_ == STOPT::V_PROJ) {
-        render3dProj(event);
-    }
-    else if ( vm_ == STOPT::V_2D ) {
-        // painting preformed AFTER glOperations(...)
-        render2d(event);
-    }
-
-
-}
-
-// text
-void GLScene::drawInstructions(QPainter *painter)
-{
-    QString text = tr("Click and drag with the left mouse button "
-                      "to rotate the Qt logo.");
-    QFontMetrics metrics = QFontMetrics(font());
-    int border = qMax(4, metrics.leading());
-
-    QRect rect = metrics.boundingRect(0, 0, width() - 2*border, int(height()*0.125),
-                                      Qt::AlignCenter | Qt::TextWordWrap, text);
-    painter->setRenderHint(QPainter::TextAntialiasing);
-    painter->fillRect(QRect(0, 0, width(), rect.height() + 2*border),
-                     QColor(0, 0, 0, 127));
-    painter->setPen(Qt::white);
-    painter->fillRect(QRect(0, 0, width(), rect.height() + 2*border),
-                      QColor(0, 0, 0, 127));
-    painter->drawText((width() - rect.width())/2, border,
-                      rect.width(), rect.height(),
-                      Qt::AlignCenter | Qt::TextWordWrap, text);
-}
-
-void GLScene::render2d(QPaintEvent *event)
-{
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    painter.save();
-    painter.fillRect(event->rect(),QBrush(colPurple_.dark()));
-    foreach (Shape *shape, shapes_) {
-        if (shape->rect().intersects(event->rect()))
-            shape->draw(&painter);
-    }
-    //drawInstructions(&painter);
-    painter.restore();
-    painter.end();
-}
-
-void GLScene::render3d(QPaintEvent *event)
-{
     Q_UNUSED(event)
     // prepare world matrix
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
 
-    // prepare scene
+
     qglClearColor(colPurple_.dark());
     glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
@@ -297,7 +247,13 @@ void GLScene::render3d(QPaintEvent *event)
     glRotatef(yRot_ / 16.0, 0.0, 1.0, 0.0);
     glRotatef(zRot_ / 16.0, 0.0, 0.0, 1.0);
 
-    box_->draw();
+    if ( vm_ == STOPT::V_3D ){
+        render3d(event);
+    }
+
+    if ( vm_ == STOPT::V_PROJ) {
+        render3dProj(event);
+    }
 
     // rollback scene
     glShadeModel(GL_FLAT);
@@ -308,6 +264,55 @@ void GLScene::render3d(QPaintEvent *event)
     // rollback world matrix
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+
+    QPainter painter(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    if ( vm_ == STOPT::V_2D ) {
+        // painting preformed AFTER glOperations(...)
+        render2d(event, painter);
+    }
+
+}
+
+// text
+void GLScene::drawInstructions(QPainter *painter)
+{
+    QString text = tr("Instruction");
+    QFontMetrics metrics = QFontMetrics(font());
+    int border = qMax(4, metrics.leading());
+
+    QRect rect = metrics.boundingRect(0, 0, width() - 2*border, int(height()*0.125),
+                                      Qt::AlignCenter | Qt::TextWordWrap, text);
+    painter->setRenderHint(QPainter::TextAntialiasing);
+    painter->fillRect(QRect(0, 0, width(), rect.height() + 2*border),
+                     QColor(0, 0, 0, 127));
+    painter->setPen(Qt::white);
+    painter->fillRect(QRect(0, 0, width(), rect.height() + 2*border),
+                      QColor(0, 0, 0, 127));
+    painter->drawText((width() - rect.width())/2, border,
+                      rect.width(), rect.height(),
+                      Qt::AlignCenter | Qt::TextWordWrap, text);
+}
+
+void GLScene::render2d(QPaintEvent *event, QPainter &painter)
+{
+    painter.save();
+    //painter.fillRect(event->rect(),QBrush(colPurple_.dark()));
+    foreach (Shape *shape, shapes_) {
+        if (shape->rect().intersects(event->rect()))
+            shape->draw(&painter);
+    }
+    //drawInstructions(&painter);
+    painter.restore();
+    painter.end();
+}
+
+void GLScene::render3d(QPaintEvent *event)
+{
+    Q_UNUSED(event)
+
+    box_->draw();
 }
 
 void GLScene::render3dProj(QPaintEvent *event)
@@ -331,5 +336,5 @@ void GLScene::resizeGL(int width, int height)
 void GLScene::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
-    createBubbles(20 - shapes_.count());
+    createHotspots(20 - shapes_.count());
 }
