@@ -87,7 +87,7 @@ void  OGLBox::buildGeometry()
    qreal depth  = dim3d_->z() * SCALE; // d  0.11
 
    // geom, w, h, d
-   GLCube cube(geom_, height, width, depth);
+   GLCube cube(geom_, width, height, depth);
 
 //   QVector3D rot(0.0, 1.0, 0.0);
 //   cube.rotate(25.0, rot);

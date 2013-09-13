@@ -25,7 +25,6 @@
 #include "scene.h"
 #include "analitycs/analitycs2d.h"
 #include "analitycs/analitycs3d.h"
-#include "support/iodata.h"
 
 using namespace std;
 
@@ -574,7 +573,7 @@ void QMainWin::saveScene(QString &fname)
 
 void QMainWin::saveData(QString &fname)
 {
-
+    ui->glScene->saveData(fname);
 }
 
 bool QMainWin::eventFilter(QObject *target, QEvent *event)
@@ -680,10 +679,10 @@ void QMainWin::projectionModeSelect(int s)
 
       if ( s == Qt::Checked) {
 
-          emit videoModeChanged(STOPT::V_PROJ);
+          ui->glScene->setProjectionMode(true);
       }
       else if (s == Qt::Unchecked) {
-          emit videoModeChanged(STOPT::V_3D);
+          ui->glScene->setProjectionMode(false);
       }
     }
 }

@@ -39,7 +39,7 @@ public:
     virtual void generatePoints();
 
     // ptr to vector of ptr - less memory consumption
-    std::vector< std::vector< STOPT::POINT > > getPointsPacked();
+    std::vector< std::vector< STOPT::POINT >* >* getPointsPacked();
     std::vector<STOPT::POINT> getPoints();
 
     STOPT::POINT* getRawPoints() { return points_; }

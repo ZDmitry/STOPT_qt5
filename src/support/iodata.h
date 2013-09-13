@@ -23,22 +23,24 @@
 
 #include <vector>
 #include "stoptdef.h"
+#include <string>
 //#include "shapes/shape.h"
 
 class IOSystem {
 public:
-	IOSystem();
+    IOSystem();
+    IOSystem(const std::string &fname);
 
-    //void  saveToEmfFile(OPENFILENAME &of, bool useBorder, const Figure* border, const vector<Figure>* pCircle)
+    void  savePointToFile(STOPT::POINT* pt, int n);
+    void  savePointToFile(const std::vector< std::vector< STOPT::POINT >* >* pt);
+    void  savePointToFile(const std::vector< std::vector< std::vector< STOPT::POINT3D >* >* >* pt);
 
-    void	saveToTxtFile(const std::vector<STOPT::POINT>*, int);
-    void	saveToTxtFile(const char* , const std::vector<STOPT::POINT>*, int);
-    void	saveToTxtFile(const char* , const std::vector<STOPT::POINT>*, double, int);
+    void  saveStatistic(int count, long cost, float time);
 
-    void    saveToTxtFile(const std::vector<STOPT::POINT3D>*, STOPT::VMODE,    int);
-    void	saveToTxtFile(const char* , const  std::vector<STOPT::POINT3D>*, STOPT::VMODE , int);
-    void	saveToTxtFile(const char* , const  std::vector<STOPT::POINT3D>*, double, STOPT::VMODE , int);
-    void	saveToTxtFile(const char* , const  std::vector<STOPT::POINT3D>*, double, double, STOPT::VMODE, int);
+private:
+    void  openFile(const std::string &fname);
+
+    std::string  filename_;
 };
 
 #endif //IOSYSTEM_H

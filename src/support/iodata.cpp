@@ -26,77 +26,6 @@
 #include <stdlib.h> 
 #include <iostream>
 
-// STL
-#include <algorithm>
-
-using namespace std;
-using namespace STOPT;
-
-void IOSystem::saveToTxtFile(const vector<POINT>* pPt, int cost)
-{
-    saveToTxtFile("points.txt", pPt, cost);
-}
-
-void IOSystem::saveToTxtFile(const char* file, const vector<POINT>* pt, int cost)
-{
-    saveToTxtFile(file, pt, 0.f, cost);
-}
-
-void IOSystem::saveToTxtFile(const char* file, const vector<POINT>* pt, double t, int cost)
-{
-	FILE* f=fopen(file,"w"); //points.txt
-    int i=0;
-	// WARN: important to leave int i, counting should start from 0
-    for (vector<POINT>::const_iterator it = pt->begin(); it != pt->end(); it++, ++i)
-        fprintf(f, "Point %d: X=%d, Y=%d\n", i, (*it).x, (*it).y);
-	fprintf(f,"==========================================================\n");
-	//if (inter)
-	//	GetWinInt(hICX1Wnd,&x);
-	//else 
-	//	GetWinInt(hCY0Wnd,&x);
-    fprintf(f,"Overall cost: %d \n", cost);
-	if (t!=0.f)
-        fprintf(f,"Elapsed time: %f sec.", t);
-	fclose(f);
-}
-
-void IOSystem::saveToTxtFile(const vector<POINT3D>* pt, VMODE vm, int cost)
-{
-    saveToTxtFile("points.txt", pt, 0.f, 0.f, vm, cost);
-}
-
-void IOSystem::saveToTxtFile(const char* file, const vector<POINT3D>* pt, VMODE vm, int cost)
-{
-    saveToTxtFile(file, pt, 0.f, 0.f, vm, cost);
-}
-
-void IOSystem::saveToTxtFile(const char* file, const vector<POINT3D>* pt, double t, VMODE vm, int cost)
-{
-    saveToTxtFile(file, pt, t, 0.f, vm, cost);
-}
-
-void IOSystem::saveToTxtFile(const char* file, const vector<POINT3D>* pt, double t, double tt, VMODE vm, int cost)
-{
-	int k=1;
-	if (vm!=V_2D) k=(-1);
-
-	FILE* f=fopen(file,"w");
-    int i=0;
-	// WARN: important to leave int i, counting should start from 0
-    for (vector<POINT3D>::const_iterator it = pt->begin(); it != pt->end(); ++it, ++i)
-        fprintf(f, "Point %d: X=%f, Y=%f, Z=%f\n", i, (*it).x, (*it).y*k, (*it).z);
-	fprintf(f,"==========================================================\n");
-	//if (inter)
-	//	GetWinInt(hICX1Wnd,&x);
-	//else 
-	//	GetWinInt(hCY0Wnd,&x);
-    fprintf(f,"Overall cost?count: %d \n",cost);
-	if (t!=0.f)
-		fprintf(f,"Elapsed time: %f sec. \n",t);
-	if (tt!=0.f)
-		fprintf(f,"Elapsed time (1): %f sec.",tt);
-	fclose(f);
-}
 
 //void IOSystem::saveToEmfFile(OPENFILENAME &of, bool useBorder, const Figure* border, const vector<Figure>* pCircle)
 //{
@@ -117,3 +46,88 @@ void IOSystem::saveToTxtFile(const char* file, const vector<POINT3D>* pt, double
 //	}
 //}
 
+IOSystem::IOSystem()
+{
+    //def. name:  points.txt
+    std::string file = "points.txt";
+
+    openFile(file);
+}
+
+IOSystem::IOSystem(const std::string &fname)
+{
+    openFile(fname);
+}
+
+void IOSystem::openFile(const std::string &fname)
+{
+    filename_ = fname;
+
+    // just create empty file;
+    FILE* f=fopen(fname.c_str(), "w"); //points.txt
+    fclose(f);
+}
+
+void IOSystem::savePointToFile(STOPT::POINT* pt, int n)
+{
+    FILE* f=fopen(filename_.c_str(), "a");
+
+    for (int i = 0; i < n; i++) {
+        fprintf(f, "Point %d: X=%d, Y=%d \n", i, pt[i].x, pt[i].y);
+    }
+
+    fclose(f);
+}
+
+void IOSystem::savePointToFile(const std::vector<std::vector<STOPT::POINT> *> *pt)
+{
+    FILE* f=fopen(filename_.c_str(), "a");
+
+    int i = 0;
+    std::vector< std::vector< STOPT::POINT >* >::const_iterator jj = pt->begin();
+    for (; jj!=pt->end(); jj++) {
+
+        std::vector< STOPT::POINT >::const_iterator kk = (*jj)->begin();
+        for (; kk!=(*jj)->end(); kk++, i++) {
+
+            fprintf(f, "Point %d: X=%d, Y=%d \n", i, (*kk).x, (*kk).y);
+        }
+    }
+
+    fclose(f);
+}
+
+void IOSystem::savePointToFile(const std::vector<std::vector<std::vector<STOPT::POINT3D> *> *> *pt)
+{
+    FILE* f=fopen(filename_.c_str(), "a");
+
+    int i = 0;
+    std::vector< std::vector< std::vector< STOPT::POINT3D >* >* >::const_iterator ii = pt->begin();
+    for (; ii!=pt->end(); ii++) {
+
+        std::vector< std::vector< STOPT::POINT3D >* >::const_iterator jj = (*ii)->begin();
+        for (; jj!=(*ii)->end(); jj++) {
+
+            std::vector< STOPT::POINT3D >::const_iterator kk = (*jj)->begin();
+            for (; kk!=(*jj)->end(); kk++, i++) {
+
+                fprintf(f, "Point %d: X=%f, Y=%f, Z=%f\n", i, (*kk).x, (*kk).y, (*kk).z );
+            }
+        }
+    }
+
+    fclose(f);
+}
+
+void IOSystem::saveStatistic(int count, long cost, float time)
+{
+
+    FILE* f=fopen(filename_.c_str(), "a");
+
+    fprintf(f, "==========================================================\n");
+    fprintf(f, "Overall count: %d \n",    count );
+    fprintf(f, "Overall cost: %ld \n",    cost  );
+    fprintf(f, "Elapsed time: %f sec \n", time  );
+
+    fclose(f);
+}

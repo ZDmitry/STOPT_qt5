@@ -48,9 +48,15 @@ public:
     void  setScale(float s) { scale_ = s; }
 
     void  setInteractiveData(bool ready, qreal width, qreal height, qreal radius);
+    void  setProjectionMode(bool enable );
+    void  setInteractiveMode(bool enable );
+
+    void  saveData(const QString &fname);
+
 
 signals:
     void pointFixed(int count, bool covered);
+
 
 public slots:
     void setXRotation(int angle);
@@ -59,7 +65,6 @@ public slots:
 
     void setVideoMode(STOPT::VMODE vm);
     void setData(Radiofield* data);
-    void setInteractiveMode(bool enable);
 
 
 protected:
@@ -80,21 +85,22 @@ private slots:
 
 
 private:
-    void createBox(qreal width, qreal height, qreal length);
-    void createRandHotspots(int number);
-    void drawHotspots();
-    void drawInstructions(QPainter *painter);
-    void setupViewport(int width, int height);
+    void  createBox(qreal width, qreal height, qreal length);
+    void  createRandHotspots(int number);
+    void  drawHotspots();
+    void  drawInstructions(QPainter &painter, const QString &text);
+    void  setupViewport(int width, int height);
 
-    void render2d(QPaintEvent *event, QPainter &painter);
-    void render3d();
-    void render3dProj();
+    void  render2d(QPaintEvent *event, QPainter &painter);
+    void  render3d();
+    void  render3dProj(QPaintEvent *event, QPainter &painter);
 
-    bool isBoxFilled();
+    bool  isBoxFilled();
 
-    bool         interactive_;
-    bool         interDataReady_;
-    qreal        interRadius_;
+    bool  projections_;
+    bool  interactive_;
+    bool  interDataReady_;
+    qreal interRadius_;
 
     STOPT::VMODE vm_;
     Radiofield*  rf_;

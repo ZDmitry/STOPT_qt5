@@ -194,7 +194,7 @@ void Radiofield3D::buildPoints(int width, int height, int lenght, int radius)
 
         for(int j=0; j<row_; j++)    // put y - height
         {
-            packedRow->push_back( new vector<POINT3D>(column_) );
+            packedRow->push_back( new vector<POINT3D>() );
             vector< POINT3D >*& packedColumn = packedRow->at(j);
             packedColumn->reserve(column_);
 

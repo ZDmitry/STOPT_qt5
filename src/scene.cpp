@@ -30,6 +30,8 @@
 #include "shapes/oglbox.h"
 #include "shapes/oglsphere.h"
 
+#include "support/iodata.h"
+
 #include <QMessageBox>
 #include <QMouseEvent>
 #include <QTime>
@@ -57,6 +59,7 @@ GLScene::GLScene(QWidget *parent) :
     box_ = nullptr;
     vm_  = STOPT::V_2D;
 
+    projections_    = false;
     interactive_    = false;
     interDataReady_ = false;
     interRadius_    = 0;
@@ -157,7 +160,12 @@ void GLScene::setVideoMode(STOPT::VMODE vm)
 
 void GLScene::setData(Radiofield *data)
 {
+    if ( rf_ != nullptr   ) {
+        delete rf_;
+        rf_ = nullptr;
+    }
     rf_ = data;
+
     data->setVideoMode(vm_);
     data->generatePoints();
 
@@ -192,19 +200,14 @@ void GLScene::setData(Radiofield *data)
 
     if ( vm_ == STOPT::V_3D ) {
 
-        OGLBox* box3d = (dynamic_cast<OGLBox*>(box_));
-        if (box3d) {
-            const QVector3D* boxDims = box3d->dimensions();
-
-            qreal width  = boxDims->x();
-            qreal height = boxDims->y();
-            qreal lenght = boxDims->z();
-
-            createBox(width, height, lenght);
-        }
-
         Radiofield3D* rfd = (dynamic_cast<Radiofield3D*>(data));
         if (rfd) {
+
+            qreal width  = rfd->getWidth();
+            qreal height = rfd->getHeight();
+            qreal lenght = rfd->getLenght();
+
+            createBox( scale_ * width, scale_ * height, scale_ * lenght);
 
             const std::vector< std::vector< std::vector< STOPT::POINT3D >* >* >* pt = rfd->getPoints();
 
@@ -437,10 +440,6 @@ void GLScene::paintEvent(QPaintEvent *event)
         render3d();
     }
 
-    if ( vm_ == STOPT::V_PROJ) {
-        render3dProj();
-    }
-
     // rollback scene
     glShadeModel(GL_FLAT);
     glDisable(GL_CULL_FACE);
@@ -462,25 +461,20 @@ void GLScene::paintEvent(QPaintEvent *event)
 }
 
 // text
-void GLScene::drawInstructions(QPainter *painter)
+void GLScene::drawInstructions(QPainter &painter, const QString &text)
 {
-    QString text = tr("Fill 'Dimensions' and at least one 'Variants' fields"
-                      "and push 'Render' to see result.\n"
-                      "Swich between 2D and 3D mode.\n"
-                      "Use mouse in 2D 'Interactive mode' to put points manualy\n"
-                      "or to rotate scene in 3D mode.");
     QFontMetrics metrics = QFontMetrics(font());
     int border = qMax(4, metrics.leading());
 
     QRect rect = metrics.boundingRect(0, 0, width() - 2*border, int(height()*0.125),
                                       Qt::AlignCenter | Qt::TextWordWrap, text);
-    painter->setRenderHint(QPainter::TextAntialiasing);
-    painter->fillRect(QRect(0, 0, width(), rect.height() + 2*border),
+    painter.setRenderHint(QPainter::TextAntialiasing);
+    painter.fillRect(QRect(0, 0, width(), rect.height() + 2*border),
                      QColor(0, 0, 0, 67));
-    painter->setPen(Qt::white);
-    painter->fillRect(QRect(0, 0, width(), rect.height() + 2*border),
+    painter.setPen(Qt::white);
+    painter.fillRect(QRect(0, 0, width(), rect.height() + 2*border),
                       QColor(0, 0, 0, 67));
-    painter->drawText((width() - rect.width())/2, border,
+    painter.drawText((width() - rect.width())/2, border,
                       rect.width(), rect.height(),
                       Qt::AlignCenter | Qt::TextWordWrap, text);
 }
@@ -499,7 +493,18 @@ void GLScene::render2d(QPaintEvent *event, QPainter &painter)
         if ( box_ != nullptr ) box_->draw(&painter);
     }
 
-    if ( shapes_.empty() ) drawInstructions(&painter);
+    if ( vm_ == STOPT::V_3D && projections_ ) render3dProj( event, painter );
+
+    if ( shapes_.empty() && !projections_ ) {
+
+        QString instr = tr("Fill 'Dimensions' and at least one 'Variants' fields"
+                          "and push 'Render' to see result.\n"
+                          "Swich between 2D and 3D mode.\n"
+                          "Use mouse in 2D 'Interactive mode' to put points manualy\n"
+                          "or to rotate scene in 3D mode.");
+
+        drawInstructions(painter, instr);
+    }
 
     painter.restore();
 }
@@ -514,7 +519,7 @@ void GLScene::drawHotspots()
             const QVector3D* boxDims = box3d->dimensions();
             // Translate to Front Left Top Box corner
             glPushMatrix();
-            glTranslated( -(boxDims->x()) /* sqrt(3.f)*/, (boxDims->y()/2.f) / sqrt(3.f), -(boxDims->z()/2.f)  /* sqrt(3.f)*/ );
+            glTranslated( -(boxDims->x()/2.f) , (boxDims->y()/2.f), -(boxDims->z()/2.f) );
 
             foreach (Shape *shape, shapes_) {
                     shape->draw();
@@ -548,8 +553,13 @@ void GLScene::render3d()
     glDisable(GL_BLEND);
 }
 
-void GLScene::render3dProj()
+void GLScene::render3dProj(QPaintEvent *event, QPainter &painter)
 {
+    Q_UNUSED(event)
+
+    QString text = tr(" Projection views are not implimented yet. ");
+
+    drawInstructions(painter, text);
 
 }
 
@@ -590,6 +600,41 @@ void GLScene::setInteractiveData(bool ready, qreal width, qreal height, qreal ra
             delete box_;
             box_ = nullptr;
         }
+    }
+}
+
+void GLScene::setProjectionMode(bool enable)
+{
+    projections_ = enable;
+    update();
+}
+
+void GLScene::saveData(const QString &fname)
+{
+    if ( rf_ != nullptr ) {
+
+        IOSystem* file = new IOSystem(fname.toStdString());
+
+        if ( vm_ == STOPT::V_2D ) {
+
+            Radiofield2D* rfd = (dynamic_cast<Radiofield2D*>(rf_));
+            if (rfd) {
+                file->savePointToFile( rfd->getRawPoints(), rfd->getCount() );
+                file->saveStatistic( rfd->getCount(), rfd->getTotalCost(), 0.f );
+            }
+
+        }
+
+        if ( vm_ == STOPT::V_3D ) {
+
+            Radiofield3D* rfd = (dynamic_cast<Radiofield3D*>(rf_));
+            if (rfd) {
+                file->savePointToFile( rfd->getPoints() );
+                file->saveStatistic( rfd->getCount(), rfd->getTotalCost(), 0.f);
+            }
+        }
+
+        delete file;
     }
 }
 

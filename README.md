@@ -20,7 +20,6 @@ FEATURES:
 --------------------------------------------------------------------------------
 - Result is count and cost for hotspots and overlap coeficient
 - 2D and 3D modes: for flat area (uses Qt) and volume rooms (uses OpenGL)
-- 3D mode supports projections views
 - Manual (user puts hotspots) and automatic (program puts hotspots) modes
 - Saves resulting array of points as plain text (*.txt)
-- Save scene to image file
+- Save scene to image file (*.png)

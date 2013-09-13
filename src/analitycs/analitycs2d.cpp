@@ -92,19 +92,21 @@ Radiofield2D& Radiofield2D::operator=(const Radiofield2D& r)
 }
 
 // get points packed into 2d vector
-std::vector< std::vector< POINT > > Radiofield2D::getPointsPacked()
+std::vector<std::vector<POINT> *> *Radiofield2D::getPointsPacked()
 {
-    vector< vector< POINT > > packedData;
-    packedData.reserve(row_);
+    vector< vector< POINT >* >* packedData = new vector< vector< POINT >* >();
+    packedData->reserve(row_);
 
     for(int i=0; i<row_; i++) {
-        vector<POINT> packedRow;
-        packedRow.reserve(column_);
+
+        packedData->push_back( new vector<POINT>(column_) );
+        vector< POINT >*& packedColumn = packedData->at(i);
+        packedColumn->reserve(column_);
 
         for(int j=0; j<column_; j++) {
-            packedRow.push_back(points_[i*column_+j]);
+            packedColumn->push_back(points_[i*column_+j]);
         }
-        packedData.push_back(packedRow);
+
     }
 
     return packedData;
