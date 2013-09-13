@@ -28,7 +28,7 @@
 #include <GL/glu.h>
 #include "support/glrendersupport.h"
 
-const qreal OGLBox::SCALE     = 0.3;
+const qreal OGLBox::SCALE     = 1.0;
 
 static inline void qSetColor(float colorVec[], QColor c)
 {
@@ -82,11 +82,18 @@ OGLBox::OGLBox(const QVector3D &position, const QVector3D &dimensions)
 
 void  OGLBox::buildGeometry()
 {
-   qreal width  = dim3d_->x() * SCALE; // 0.113137
-   qreal height = dim3d_->y() * SCALE; // 0.311126
-   qreal depth  = dim3d_->z() * SCALE; // 0.11
+   qreal width  = dim3d_->x() * SCALE; // w  0.113137
+   qreal height = dim3d_->y() * SCALE; // h  0.311126
+   qreal depth  = dim3d_->z() * SCALE; // d  0.11
 
-   GLCube cube(geom_, width, height, depth);
+   // geom, w, h, d
+   GLCube cube(geom_, height, width, depth);
+
+//   QVector3D rot(0.0, 1.0, 0.0);
+//   cube.rotate(25.0, rot);
+//   rot.setX(1.0);
+//   rot.setY(0.0);
+//   cube.rotate(20.0, rot);
 
    parts_ << cube.parts;
 

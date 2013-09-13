@@ -29,7 +29,7 @@ public:
     virtual ~Shape() {}
 
     // position (by boundingRect)
-    virtual void   move(const QRectF &boundRect) = 0;
+    virtual void   move(const QPointF &pt) = 0;
     virtual QRectF rect() const = 0;
 
     // for 2d shapes (uses QPainter)

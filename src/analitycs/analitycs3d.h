@@ -62,7 +62,7 @@ private:
     virtual int  blockCount(int lenght, int radius);
     bool pointCoverage(STOPT::POINT3D p, STOPT::POINT3D s, int r);
 
-    void buildPoints(int height, int width, int lenght, int radius);
+    void buildPoints(int width, int height, int lenght, int radius);
 
     void freeMem();
 

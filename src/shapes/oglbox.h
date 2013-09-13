@@ -37,7 +37,7 @@ public:
     ~OGLBox();
 
     // nothing to do
-    void       move(const QRectF &boundRect) {}
+    void       move(const QPointF &) {}
     // correct move
     void       move(const QVector3D &newPos);
 

@@ -104,7 +104,8 @@ void WinMain::about()
     QMessageBox::about(this, tr("About..."),
              tr("The <b>STOPT</b> is application for topological<br>"
                 "optimization that uses Qt5 and OpenGL.<br><br>"
-                "Made by ZDmitry ( <a href='mailto:hiroshidi@gmail.com'>hiroshidi@gmail.com</a> )"));
+                "Made by ZDmitry ( <a href='mailto:hiroshidi@gmail.com'>hiroshidi@gmail.com</a> )"
+                "<br>under GNU GPL v3 licence"));
 }
 
 void WinMain::createActions()

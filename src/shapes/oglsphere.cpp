@@ -73,7 +73,8 @@ void OGLSphere::move(const QVector3D &newPos)
 
 QRectF OGLSphere::rect() const
 {
-    return QRectF(pos_.x() - radius_, pos_.y() - radius_,
+    return QRectF(pos_.x(), // - radius_,
+                  pos_.y(), // - radius_,
                   2 * radius_, 2 * radius_);
 }
 
@@ -93,8 +94,8 @@ void OGLSphere::draw() const
     gluQuadricTexture(params,GL_TRUE);
 
     glPushMatrix();
-        //glScalef(s,s,s);
-        //glTranslatef(x,y,z);
+        //glScalef(radius_, radius_, radius_);
+        glTranslatef(pos3d_->x(), pos3d_->y(), pos3d_->z());
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, fColor_);
 
         //glMaterialfv(GL_FRONT,GL_AMBIENT,make_vect(0.2473f, 0.1995f, 0.0745f, 1.0f));
@@ -111,7 +112,7 @@ void OGLSphere::draw() const
             gluQuadricDrawStyle(params,GLU_FILL);
 
         //args: [1]GLUquadric*, [2]GLdouble, [3]GLint, [4]GLint
-        gluSphere(params, radius_*1.16f, SPHERE_SLICE, SPHERE_STACK);
+        gluSphere(params, radius_/*1.16f*/, SPHERE_SLICE, SPHERE_STACK);
 
     glPopMatrix();
 
@@ -120,7 +121,7 @@ void OGLSphere::draw() const
 }
 ////////////////////////////////
 
-//void  OglSphere::render(bool useCore)
+//void OglSphere::render(bool useCore)
 //{
 //    if (useCore) drawCenter();
 //    draw();

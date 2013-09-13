@@ -36,28 +36,21 @@ GPBox::GPBox(const QPointF &position, qreal width, qreal height)
     box_.setWidth(width);
 }
 
-void GPBox::move(const QRectF &boundRect)
+GPBox::GPBox(const QPointF &position, const QPointF &dimensions)
+    : Shape(position)
 {
-    qreal leftOverflow   = pos_.x() - box_.width()  - boundRect.left();
-    qreal rightOverflow  = pos_.x() + box_.width()  - boundRect.right();
-    qreal topOverflow    = pos_.y() - box_.height() - boundRect.top();
-    qreal bottomOverflow = pos_.y() + box_.height() - boundRect.bottom();
+    box_.setTopLeft(position);
+    box_.setWidth(dimensions.x());
+    box_.setHeight(dimensions.y());
+}
 
-    if (leftOverflow < 0.0) {
-        pos_.setX(pos_.x() - 2 * leftOverflow);
-        box_.setX(pos_.x());
-    } else if (rightOverflow > 0.0) {
-        pos_.setX(pos_.x() - 2 * rightOverflow);
-        box_.setX(pos_.x());
-    }
+void GPBox::move(const QPointF &pt)
+{
+    box_.setX(pt.x());
+    pos_.setX(pt.x());
 
-    if (topOverflow < 0.0) {
-        pos_.setY(pos_.y() - 2 * topOverflow);
-        box_.setY(pos_.y());
-    } else if (bottomOverflow > 0.0) {
-        pos_.setY(pos_.y() - 2 * bottomOverflow);
-        box_.setY(pos_.y());
-    }
+    box_.setY(pt.y());
+    pos_.setY(pt.y());
 }
 
 QRectF GPBox::rect() const
@@ -71,6 +64,17 @@ void GPBox::draw(QPainter *painter) const
     painter->setBackgroundMode(Qt::TransparentMode);
     painter->drawRect(box_);
     painter->restore();
+}
+
+void GPBox::setDimensions(const QPointF &dims)
+{
+    box_.setWidth(dims.x());
+    box_.setHeight(dims.y());
+}
+
+QPointF GPBox::getDimensions()
+{
+    return QPointF(box_.width(), box_.height());
 }
 
 void GPBox::updateBrush()

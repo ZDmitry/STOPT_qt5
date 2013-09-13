@@ -59,8 +59,8 @@ public:
 private:
     virtual int blockCount(int lenght, int radius);
 
-    void buildPoints(int height, int width, int radius);
-    void buildPoints(int height, int width, int radius, int sh);
+    void buildPoints(int width, int height, int radius);
+    void buildPoints(int width, int height, int radius, int sh);
 
     // manual filling flag
     bool   dynGenerated_;

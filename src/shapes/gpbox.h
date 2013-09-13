@@ -26,17 +26,21 @@
 class GPBox: public Shape {
 public:
     GPBox(const QPointF &position, qreal width, qreal height);
+    GPBox(const QPointF &position, const QPointF &dimensions);
 
-    void   move(const QRectF &boundRect);
-    QRectF rect() const;
+    void     move(const QPointF &pt);
+    QRectF   rect() const;
 
-    void   draw(QPainter *painter) const;
+    void     draw(QPainter *painter) const;
 
-    void   setWidth(qreal w) { box_.setWidth(w); }
-    int    getWidth() const { return box_.width(); }
+    void     setDimensions(const QPointF &dims);
+    QPointF  getDimensions();
 
-    void   setHeight(qreal h) { box_.setHeight(h); }
-    int    getHeight() const { return box_.height(); }
+    void     setWidth(qreal w) { box_.setWidth(w); }
+    int      getWidth() const { return box_.width(); }
+
+    void     setHeight(qreal h) { box_.setHeight(h); }
+    int      getHeight() const { return box_.height(); }
 
 private:
     GPBox(const GPBox &) = delete;

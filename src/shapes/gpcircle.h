@@ -27,7 +27,7 @@ class GPCircle: public Shape {
 public:
     GPCircle(const QPointF &position, qreal radius, int num);
 
-    void   move(const QRectF &boundRect);
+    void   move(const QPointF &pt);
     QRectF rect() const;
 
     void   draw(QPainter *painter) const;

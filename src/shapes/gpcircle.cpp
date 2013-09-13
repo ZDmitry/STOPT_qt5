@@ -31,29 +31,16 @@ GPCircle::GPCircle(const QPointF &position, qreal radius, int number)
     updateBrush();
 }
 
-void GPCircle::move(const QRectF &boundRect)
+void GPCircle::move(const QPointF &pt)
 {
-    qreal leftOverflow   = pos_.x() - radius_ - boundRect.left();
-    qreal rightOverflow  = pos_.x() + radius_ - boundRect.right();
-    qreal topOverflow    = pos_.y() - radius_ - boundRect.top();
-    qreal bottomOverflow = pos_.y() + radius_ - boundRect.bottom();
-
-    if (leftOverflow < 0.0) {
-        pos_.setX(pos_.x() - 2 * leftOverflow);
-    } else if (rightOverflow > 0.0) {
-        pos_.setX(pos_.x() - 2 * rightOverflow);
-    }
-
-    if (topOverflow < 0.0) {
-        pos_.setY(pos_.y() - 2 * topOverflow);
-    } else if (bottomOverflow > 0.0) {
-        pos_.setY(pos_.y() - 2 * bottomOverflow);
-    }
+    pos_.setX(pt.x());
+    pos_.setY(pt.y());
 }
 
 QRectF GPCircle::rect() const
 {
-    return QRectF(pos_.x() - radius_, pos_.y() - radius_,
+    return QRectF(pos_.x() - radius_,
+                  pos_.y() - radius_,
                   2 * radius_, 2 * radius_);
 }
 

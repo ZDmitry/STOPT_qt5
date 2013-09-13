@@ -44,6 +44,14 @@ public:
     int yRotation() const { return yRot_; }
     int zRotation() const { return zRot_; }
 
+    float getScale() { return scale_; }
+    void  setScale(float s) { scale_ = s; }
+
+    void  setInteractiveData(bool ready, qreal width, qreal height, qreal radius);
+
+signals:
+    void pointFixed(int count, bool covered);
+
 public slots:
     void setXRotation(int angle);
     void setYRotation(int angle);
@@ -51,43 +59,62 @@ public slots:
 
     void setVideoMode(STOPT::VMODE vm);
     void setData(Radiofield* data);
+    void setInteractiveMode(bool enable);
+
 
 protected:
     void initializeGL();
 //  void paintGL();
     void paintEvent(QPaintEvent *event);
     void resizeGL(int width, int height);
+
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+
     void showEvent(QShowEvent *event);
+
 
 private slots:
     void animate();
 
+
 private:
-    void createHotspots(int number);
+    void createBox(qreal width, qreal height, qreal length);
+    void createRandHotspots(int number);
+    void drawHotspots();
     void drawInstructions(QPainter *painter);
     void setupViewport(int width, int height);
 
     void render2d(QPaintEvent *event, QPainter &painter);
-    void render3d(QPaintEvent *event);
-    void render3dProj(QPaintEvent *event);
+    void render3d();
+    void render3dProj();
+
+    bool isBoxFilled();
+
+    bool         interactive_;
+    bool         interDataReady_;
+    qreal        interRadius_;
 
     STOPT::VMODE vm_;
     Radiofield*  rf_;
 
     GLuint object;
-    int xRot_;
-    int yRot_;
-    int zRot_;
+    int    xRot_;
+    int    yRot_;
+    int    zRot_;
+    float  scale_;
     QPoint lastPos_;
 
     QColor colGreen_;
     QColor colPurple_;
 
-    OGLBox* box_;
+    Shape*        box_;
     QList<Shape*> shapes_;
-    QTimer animationTimer;
+    QTimer        animationTimer;
+
+
+    static const int START_SHIFT_POS2D = 20;
 };
 
 #endif // SCENE_H

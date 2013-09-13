@@ -51,19 +51,19 @@ Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius) :
     Radiofield(width, height, radius, 0), lenght_(lenght)
 {
     points_ = new  vector< vector< vector< POINT3D >* >* >();
-    buildPoints(height, width, lenght, radius);
+    buildPoints(width, height, lenght, radius);
 }
 
 Radiofield3D::Radiofield3D(int width, int height, int lenght, int radius, int cost) :
     Radiofield(width, height, radius, cost), lenght_(lenght)
 {
     points_ = new  vector< vector< vector< POINT3D >* >* >();
-    buildPoints(height, width, lenght, radius);
+    buildPoints(width, height, lenght, radius);
 }
 
 void Radiofield3D::generatePoints()
 {
-    buildPoints(height_, width_, lenght_, radius_);
+    buildPoints(width_, height_, lenght_, radius_);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -160,7 +160,7 @@ int  Radiofield3D::getOptimalVariant(const std::vector< Radiofield3D* >* var)
 }
 
 // build points using dimensions and radius
-void Radiofield3D::buildPoints(int height, int width, int lenght, int radius)
+void Radiofield3D::buildPoints(int width, int height, int lenght, int radius)
 {
     column_ = blockCount(width,  radius);  // x  i  a
     row_    = blockCount(height, radius);  // y  j  b
@@ -202,9 +202,9 @@ void Radiofield3D::buildPoints(int height, int width, int lenght, int radius)
             {
                 //ii=k*nw*nl+i*nl+j
                 POINT3D pt;
-                pt.x=a*i+rx+ds;         // a  i  x
-                pt.y=(-1)*(b*j+ry+ds);  // b  j  y
-                pt.z=c*k+rz+ds;         // c  z  k
+                pt.x=a*i+rx+ds;         // a  i  x  // a*i+rx+ds;
+                pt.y=(-1)*(b*j+ry+ds);  // b  j  y  // (-1)*(b*j+ry+ds);
+                pt.z=c*k+rz+ds;         // c  z  k  // c*k+rz+ds;
 
                 packedColumn->push_back(pt);
             }

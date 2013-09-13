@@ -73,12 +73,16 @@ public slots:
     void dimensionsPassed(QString);
 
     void prepareData();
+    void readInteractiveData(QString);
+    void writeInteractiveResults(int count, bool covered);
     void saveScene(QString &fname);
     void saveData(QString &fname);
 
 private:
     Ui::QMainWin *ui;
     //GLScene* glScene
+
+    QList< QPair<int, int> > hsPoints_;
 
     // first - radius, second - price
     QList< QPair<QLineEdit*, QLineEdit*> > li2dVariantsIn;

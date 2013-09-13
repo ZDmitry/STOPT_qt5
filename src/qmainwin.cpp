@@ -199,6 +199,9 @@ QMainWin::QMainWin(QWidget *parent) :
     connect(ui->chb2dInteractive,SIGNAL(stateChanged(int)), this, SLOT(interactionModeSelect(int)));
     connect(ui->chb3dProjections, SIGNAL(stateChanged(int)), this, SLOT(projectionModeSelect(int)));
 
+    connect(ui->tb2dInteractiveRadius,SIGNAL(textChanged(QString)), this, SLOT(readInteractiveData(QString)));
+    connect(ui->tb2dInteractivePrice,SIGNAL(textChanged(QString)), this, SLOT(readInteractiveData(QString)));
+
     foreach(QCheckBox* chb, li2dVariantsBest) {
         chb->installEventFilter(this);
     }
@@ -216,6 +219,7 @@ QMainWin::QMainWin(QWidget *parent) :
     // Scene connections
     connect(this, SIGNAL(videoModeChanged(STOPT::VMODE)), ui->glScene, SLOT(setVideoMode(STOPT::VMODE)));
     connect(this, SIGNAL(dataReady(Radiofield*)), ui->glScene, SLOT(setData(Radiofield*)));
+    connect(ui->glScene, SIGNAL(pointFixed(int,bool)), this, SLOT(writeInteractiveResults(int,bool)));
 }
 
 void QMainWin::clearFields(QWidget* tab)
@@ -420,8 +424,10 @@ void QMainWin::prepareData()
             delete f;
         }
         delete rf;
+    // endif ( vm_ == V_2D)
     }
-    else if (ui->twVideoMode->currentWidget() ==
+
+    if (ui->twVideoMode->currentWidget() ==
              ui->tab3dMode) {
 
         it = li3dVariantsIn;
@@ -483,11 +489,82 @@ void QMainWin::prepareData()
             delete f;
         }
         delete rf;
+
+    // endif ( vm_ == V_3D)
     }
 
     //if ( best != nullptr ) delete best;
 
     emit dataReady(best);
+}
+
+void QMainWin::readInteractiveData(QString)
+{
+    if (ui->twVideoMode->currentWidget() ==
+            ui->tab2dMode) {
+
+        if (ui->tb2dInteractiveRadius->text().isEmpty() ||
+                ui->tb2dInteractivePrice->text().isEmpty()) {
+
+            ui->glScene->setInteractiveData(false, 0, 0, 0);
+
+            ui->tb2dInteractiveCost->text().clear();
+            ui->tb2dInteractiveCount->text().clear();
+
+            ui->pb2dCoverage->setValue(0);
+            ui->pb2dCoverage->setEnabled(false);
+            clearFields(ui->gb2dOverlap);
+            enableFieldsGroup(ui->gb2dOverlap,false);
+        }
+        else {
+            ui->pb2dCoverage->setValue(0);
+            ui->pb2dCoverage->setEnabled(true);
+            clearFields(ui->gb2dOverlap);
+            enableFieldsGroup(ui->gb2dOverlap,true);
+
+            int radius = ui->tb2dInteractiveRadius->text().toInt();
+            int height = ui->tb2dHeight->text().toInt();
+            int width  = ui->tb2dWidth->text().toInt();
+
+            ui->glScene->setInteractiveData(true, width, height, radius);
+        }
+
+    }
+}
+
+void QMainWin::writeInteractiveResults(int count, bool covered)
+{
+    int radius = ui->tb2dInteractiveRadius->text().toInt();
+    int price  = ui->tb2dInteractivePrice->text().toInt();
+
+    ui->tb2dInteractiveCount->setText(QString::number(count));
+
+    int height = ui->tb2dHeight->text().toInt();
+    int width  = ui->tb2dWidth->text().toInt();
+
+    ui->tb2dCoverTask->setText(QString::number(width*height));
+
+    hsPoints_.append(QPair<int, int>(radius, price));
+
+    if (covered) {
+        ui->pb2dCoverage->setValue(100);
+    }
+
+    QListIterator< QPair<int, int> > it = hsPoints_;
+
+    qreal square = 0;
+    qreal cost   = 0;
+
+    while( it.hasNext() ) {
+        QPair<int, int> p = it.next();
+        square += (p.first*2)*(p.first*2);
+        cost   += p.second;
+    }
+
+    ui->tb2dInteractiveCost->setText(QString::number(cost));
+    ui->tb2dSquare->setText(QString::number(square));
+    qreal overlap = square/(width*height);
+    ui->tb2dOverlap->setText(QString::number(overlap));
 }
 
 void QMainWin::saveScene(QString &fname)
@@ -582,11 +659,17 @@ void QMainWin::interactionModeSelect(int s)
         ui->gb2dInteractive->setVisible(true);
         ui->gb2dVariants->setVisible(false);
         ui->btnRender->setEnabled(false);
+
+        hsPoints_.clear();
+        ui->glScene->setInteractiveMode(true);
     }
     else if ( s == Qt::Unchecked) {
         ui->gb2dInteractive->setVisible(false);
         ui->gb2dVariants->setVisible(true);
         ui->btnRender->setEnabled(true);
+
+        hsPoints_.clear();
+        ui->glScene->setInteractiveMode(false);
     }
 }
 

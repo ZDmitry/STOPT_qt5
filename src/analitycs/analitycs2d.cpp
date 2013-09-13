@@ -243,13 +243,13 @@ int Radiofield2D::getOptimalVariant(const std::vector<Radiofield2D *> *var)
 }
 
 // build points using dimensions and radius
-void Radiofield2D::buildPoints(int height, int width, int radius)
+void Radiofield2D::buildPoints(int width, int height, int radius)
 {
-    return Radiofield2D::buildPoints(height, width, radius, 0);
+    return Radiofield2D::buildPoints(width, height, radius, 0);
 }
 
 // build points using dimensions and radius + some shift
-void Radiofield2D::buildPoints(int height, int width, int radius, int sh)
+void Radiofield2D::buildPoints(int width, int height, int radius, int sh)
 {
     dynGenerated_ = false;
 
