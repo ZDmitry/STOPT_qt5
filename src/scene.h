@@ -55,7 +55,7 @@ public:
 
 
 signals:
-    void pointFixed(int count, bool covered);
+    void pointFixed(int count, qreal covered);
 
 
 public slots:
@@ -95,7 +95,7 @@ private:
     void  render3d();
     void  render3dProj(QPaintEvent *event, QPainter &painter);
 
-    bool  isBoxFilled();
+    qreal filledAreaPercent();
 
     bool  projections_;
     bool  interactive_;

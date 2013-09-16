@@ -74,7 +74,7 @@ public slots:
 
     void prepareData();
     void readInteractiveData(QString);
-    void writeInteractiveResults(int count, bool covered);
+    void writeInteractiveResults(int count, qreal covered);
     void saveScene(QString &fname);
     void saveData(QString &fname);
 

@@ -17,6 +17,7 @@
 *.tmp
 *.user
 
+*.lnk
 *.doc
 *.docx
 *.rar
@@ -28,6 +29,7 @@
 #
 # Top-level generic files
 #
+bin
 Debug
 Release
 

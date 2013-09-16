@@ -51,6 +51,14 @@ static inline GLfloat gradToRad(GLfloat a)
     return (a * M_PI / 180); // dgr -> rad
 }
 
+long innerArea(QVector<QRect> rg)
+{
+    long sq = 0;
+    foreach(QRect r, rg) {
+        sq+=r.height()*r.width();
+    }
+    return sq;
+}
 
 GLScene::GLScene(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -379,7 +387,7 @@ void GLScene::mouseReleaseEvent(QMouseEvent *event)
             if ( box_->rect().contains(dest) ) {
                 shapes_.last()->move(dest);
 
-                emit pointFixed(shapes_.size(), isBoxFilled());
+                emit pointFixed(shapes_.size(), filledAreaPercent());
                 update();
             }
         }
@@ -563,9 +571,10 @@ void GLScene::render3dProj(QPaintEvent *event, QPainter &painter)
 
 }
 
-bool GLScene::isBoxFilled()
+qreal GLScene::filledAreaPercent()
 {
-    bool b = false;
+    qreal filled = 0; //0%
+
     if ( vm_ == STOPT::V_2D && !shapes_.empty() &&
          box_ != nullptr ) {
 
@@ -575,10 +584,15 @@ bool GLScene::isBoxFilled()
         }
 
         QRegion rgBox(box_->rect().toRect());
-        rgBox = rgBox.subtracted(rgRF);
-        b = rgBox.isEmpty();
+
+        qreal filledArea = innerArea(rgBox.intersected(rgRF).rects());
+        qreal boxArea = box_->rect().height() * box_->rect().width();
+        //rgBox = rgBox.subtracted(rgRF);
+        filled = filledArea/boxArea;
+
     }
-    return b;
+
+    return filled;
 }
 
 QSize GLScene::sizeHint() const

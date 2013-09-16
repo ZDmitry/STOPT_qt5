@@ -218,7 +218,7 @@ QMainWin::QMainWin(QWidget *parent) :
     // Scene connections
     connect(this, SIGNAL(videoModeChanged(STOPT::VMODE)), ui->glScene, SLOT(setVideoMode(STOPT::VMODE)));
     connect(this, SIGNAL(dataReady(Radiofield*)), ui->glScene, SLOT(setData(Radiofield*)));
-    connect(ui->glScene, SIGNAL(pointFixed(int,bool)), this, SLOT(writeInteractiveResults(int,bool)));
+    connect(ui->glScene, SIGNAL(pointFixed(int,qreal)), this, SLOT(writeInteractiveResults(int,qreal)));
 }
 
 void QMainWin::clearFields(QWidget* tab)
@@ -531,7 +531,7 @@ void QMainWin::readInteractiveData(QString)
     }
 }
 
-void QMainWin::writeInteractiveResults(int count, bool covered)
+void QMainWin::writeInteractiveResults(int count, qreal covered)
 {
     int radius = ui->tb2dInteractiveRadius->text().toInt();
     int price  = ui->tb2dInteractivePrice->text().toInt();
@@ -545,8 +545,12 @@ void QMainWin::writeInteractiveResults(int count, bool covered)
 
     hsPoints_.append(QPair<int, int>(radius, price));
 
-    if (covered) {
+    int cvgPercent = qRound(covered*100);
+    if (cvgPercent > 100) {
         ui->pb2dCoverage->setValue(100);
+    }
+    else {
+        ui->pb2dCoverage->setValue(cvgPercent);
     }
 
     QListIterator< QPair<int, int> > it = hsPoints_;
