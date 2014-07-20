@@ -11,6 +11,8 @@ QMAKE_CXXFLAGS += -std=gnu++0x -Wno-narrowing -Wno-reorder
 
 TARGET = STOPT
 
+LIBS += -lGLU
+
 SOURCES += main.cpp\
     qmainwin.cpp \
     scene.cpp \
