@@ -4,7 +4,7 @@ PROJECT NAME: STOPT (Qt ver.)
 - LICENCE:  GPLv3    
 - L18n:     EN
 - TOOLS:    Qt 5.1.1, Qt Creator
-- LIBS:     OpenGL
+- LIBS:     OpenGL, libGLU
 
 DESCRIPTION:
 --------------------------------------------------------------------------------
