@@ -79,6 +79,7 @@ bool WinMain::saveScene()
 
     bool res = saveFile(fname, title, filter);
     if (res) {
+        if ( !fname.endsWith(".png", Qt::CaseInsensitive) ) fname += ".png";
         body_->saveScene(fname);
     }
 
@@ -93,6 +94,7 @@ bool WinMain::saveData()
 
     bool res = saveFile(fname, title, filter);
     if (res) {
+        if ( !fname.endsWith(".txt", Qt::CaseInsensitive) ) fname += ".txt";
         body_->saveData(fname);
     }
 
