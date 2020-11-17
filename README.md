@@ -1,6 +1,6 @@
 PROJECT NAME: STOPT (Qt ver.)
 ================================================================================
-- AUTHOR:   Zagnoyko Dmitry (hiroshidi@gmail.com)  
+- AUTHOR:   Zagnoyko Dmitry ( zagnoyko.dmitry@gmail.com )  
 - LICENCE:  GPLv3    
 - L18n:     EN
 - TOOLS:    Qt 5.1.1, Qt Creator
